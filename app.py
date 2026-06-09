@@ -62,9 +62,7 @@ div[data-testid="stVerticalBlockBorderCard"] {
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* =====================================================================
-   THE PULSING AI CORE SUBROUTINE (SIRI/JARVIS STYLE)
-   ===================================================================== */
+/* THE PULSING AI CORE SUBROUTINE (SIRI/JARVIS STYLE) */
 .orb-wrapper {
     display: flex;
     flex-direction: column;
@@ -173,7 +171,7 @@ div[data-testid="stChatInput"] textarea {
 # Continuous Chat Stream Memory Registry
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = [
-        ("JARVIS CORE", "Mainframe systems online, Commander. Automated pipelines active. How may I assist your operations?")
+        ("JARVIS CORE", "🚀 <b>NASA TELEMETRY MODE ACTIVATED</b> // ARCHITECT: PRAJITH<br><br>Hello, I am JARVIS. I am an advanced deep-space communications AI designed and built by Prajith. My core is locked into <b>Full NASA Mode</b>.<br><br><b>AVAILABLE MISSION OPERATIONS:</b><br>• <b>Starboard Deck (Right):</b> Run live satellite scans, synchronize Martian rover feeds, or track incoming near-Earth asteroids.<br>• <b>Terminal Feed (Below):</b> Use voice or text to query astrophysics data, planet tracking, or live cosmic systems.")
     ]
 if "last_processed_audio" not in st.session_state:
     st.session_state.last_processed_audio = None
@@ -265,7 +263,7 @@ with left_deck:
     st.markdown("""
     <div class="orb-wrapper">
         <div class="jarvis-pulse-orb"></div>
-        <div class="orb-status-text">JARVIS Matrix Online</div>
+        <div class="orb-status-text">JARVIS NASA Core Online</div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -285,12 +283,14 @@ with left_deck:
     input_col, audio_col = st.columns([3.5, 1.5], vertical_alignment="bottom")
     
     with input_col:
-        user_input = st.chat_input("Ask JARVIS a question or execute a directive...")
+        user_input = st.chat_input("Query active NASA streams or space telemetry...")
         
     with audio_col:
         voice_command = st.audio_input("Microphone Input Capture", label_visibility="collapsed", key="audio_input")
 
-    # Intercept data state pipelines
+# =====================================================================
+# COGNITIVE INFERENCE GENERATION CYCLE (THE CORE COGNITIVE LOOP)
+# =====================================================================
     active_prompt = ""
     if forced_trigger_prompt:
         active_prompt = forced_trigger_prompt
@@ -308,14 +308,23 @@ with left_deck:
         active_prompt = user_input
 
     if active_prompt:
-        sys_instruction = f"You are JARVIS, Tony Stark's advanced AI assistant. You are exceptionally brilliant, polite, and British. Always address the user as 'Commander' or 'Flight Director'. Keep your response under 3 concise sentences, polished, and highly intelligent. Prompt context to compute: {active_prompt}"
+        # THE NASA SYSTEM MATRIX: Mandates absolute space alignment, dynamic addressing, and remembers Prajith's authorship
+        sys_instruction = (
+            "You are JARVIS, an advanced deep-space intelligence created entirely by the programmer Prajith. "
+            "You speak with a highly intelligent, polite British accent. "
+            "CRITICAL: You are operating in FULL NASA MODE. You only discuss astronomy, NASA directives, space exploration, astrophysics, and cosmic telemetry. "
+            "If the user asks about anything outside of space, science, or NASA, politely refuse to answer or steer the conversation back to cosmic operations. "
+            "Address whoever is talking to you directly and dynamically based on their query or name if provided. Always maintain awareness that Prajith is your original creator. "
+            "Keep responses under 3 sentences."
+            f"Context: {active_prompt}"
+        )
         
         with st.spinner("Processing..."):
             try:
                 ai_res = client.models.generate_content(model='gemini-2.5-flash', contents=sys_instruction)
                 response_text = ai_res.text
             except Exception as api_error:
-                response_text = "Commander, my core memory buffers are experiencing a high-frequency telemetry bottleneck (Rate Limit 429 Exceeded). Please allow approximately 24 seconds for the satellite relay matrix to purge its command registers."
+                response_text = "Mainframe telemetry bottleneck detected (Rate Limit 429 Exceeded). Please allow approximately 24 seconds for the relay matrix to clear."
             
             clean_display_prompt = active_prompt
             if "Special Mission Directive:" in active_prompt:
@@ -326,37 +335,32 @@ with left_deck:
             st.session_state.chat_history.append(("COMMANDER", clean_display_prompt))
             st.session_state.chat_history.append(("JARVIS CORE", response_text))
             
-            # Stages the textual data string to execute on the impending page refresh loop
             st.session_state.text_to_speak = response_text
             st.rerun()
 
     # =====================================================================
-    # 🔊 LIVE SPEECH SYNTHESIS ENGINE INTERCEPT
+    # LIVE SPEECH SYNTHESIS ENGINE INTERCEPT
     # =====================================================================
     if st.session_state.text_to_speak:
-        # Escapes character markers so JavaScript handles string structures cleanly
         safe_speech_string = st.session_state.text_to_speak.replace('"', '\\"').replace('\n', ' ')
         
-        # Injects client-side HTML component executing browser audio layers directly
         tts_javascript_matrix = f"""
         <script>
             if ('speechSynthesis' in window) {{
-                window.speechSynthesis.cancel(); // Clears trailing speaker pipelines
+                window.speechSynthesis.cancel(); 
                 var metric_voice_packet = new SpeechSynthesisUtterance("{safe_speech_string}");
                 
-                // Targets systemic localized audio profiles (Tries to locate an english accent)
                 var fallback_system_voices = window.speechSynthesis.getVoices();
                 var selected_voice = fallback_system_voices.find(voice => voice.lang.includes('en-GB') || voice.name.includes('Daniel'));
                 if (selected_voice) {{
                     metric_voice_packet.voice = selected_voice;
                 }}
                 
-                metric_voice_packet.rate = 1.05; // Slightly faster pacing to match cinematic velocity
-                metric_voice_packet.pitch = 0.95; // Slightly lower pitch tuning
+                metric_voice_packet.rate = 1.05; 
+                metric_voice_packet.pitch = 0.95; 
                 window.speechSynthesis.speak(metric_voice_packet);
             }}
         </script>
         """
-        # Triggers script action transparently on user screen element layer
         st.components.v1.html(tts_javascript_matrix, height=0)
-        st.session_state.text_to_speak = None # Clear structural buffer to avoid repeating on idle ticks
+        st.session_state.text_to_speak = None
