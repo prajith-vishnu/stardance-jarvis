@@ -166,19 +166,25 @@ div[data-testid="stChatInput"] textarea {
     color: #00E5FF !important;
 }
 
-/* Specialized High-Tech Boot Button Style Customization */
+/* 👑 MASSIVE CINEMATIC STARTUP BUTTON OVERRIDE CSS RULES */
 .boot-container div button {
-    background: linear-gradient(135deg, rgba(0, 229, 255, 0.15) 0%, rgba(0, 102, 255, 0.2) 100%) !important;
-    border: 1px solid #00E5FF !important;
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.2) 0%, rgba(0, 102, 255, 0.3) 100%) !important;
+    border: 2px solid #00E5FF !important;
     color: #00E5FF !important;
-    font-weight: 600 !important;
-    letter-spacing: 1px !important;
+    font-weight: 700 !important;
+    font-size: 20px !important;
+    letter-spacing: 2px !important;
     text-align: center !important;
-    box-shadow: 0 0 15px rgba(0, 229, 255, 0.2) !important;
+    padding: 24px 40px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 0 30px rgba(0, 229, 255, 0.3) !important;
+    transition: all 0.3s ease !important;
 }
 .boot-container div button:hover {
-    background: linear-gradient(135deg, rgba(0, 229, 255, 0.25) 0%, rgba(0, 102, 255, 0.4) 100%) !important;
-    box-shadow: 0 0 25px rgba(0, 229, 255, 0.4) !important;
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.4) 0%, rgba(0, 102, 255, 0.6) 100%) !important;
+    box-shadow: 0 0 50px rgba(0, 229, 255, 0.6) !important;
+    transform: scale(1.02);
+    color: #FFFFFF !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -285,8 +291,7 @@ with left_deck:
     """, unsafe_allow_html=True)
     
     # SYSTEM AUDIO BYPASS INTERCEPT VALVE:
-    # If the user hasn't clicked initialize yet, show the high-visibility boot layout.
-    # Clicking this gives browser permission to play audio strings instantly.
+    # If the user hasn't clicked initialize yet, show the high-visibility massive boot layout.
     if not st.session_state.vocal_matrix_initialized:
         st.markdown("<div class='boot-container'>", unsafe_allow_html=True)
         if st.button("⚡ INITIALIZE JARVIS VOCAL MATRIX"):
@@ -307,14 +312,18 @@ with left_deck:
                 
     st.write("")
     
-    # Horizontally bounded inputs
-    input_col, audio_col = st.columns([3.5, 1.5], vertical_alignment="bottom")
-    
-    with input_col:
-        user_input = st.chat_input("Query active NASA streams or space telemetry...")
-        
-    with audio_col:
-        voice_command = st.audio_input("Microphone Input Capture", label_visibility="collapsed", key="audio_input")
+    # GATED INPUT ARCHITECTURE:
+    # Chat controls are completely locked out of the DOM environment until validation is cleared.
+    if st.session_state.vocal_matrix_initialized:
+        input_col, audio_col = st.columns([3.5, 1.5], vertical_alignment="bottom")
+        with input_col:
+            user_input = st.chat_input("Query active NASA streams or space telemetry...")
+        with audio_col:
+            voice_command = st.audio_input("Microphone Input Capture", label_visibility="collapsed", key="audio_input")
+    else:
+        st.info("🔒 Mainframe Interface Intercepted: Click the initialization matrix above to establish terminal uplink permissions.")
+        user_input = None
+        voice_command = None
 
 # =====================================================================
 # COGNITIVE INFERENCE GENERATION CYCLE (THE CORE COGNITIVE LOOP)
@@ -336,9 +345,6 @@ with left_deck:
         active_prompt = user_input
 
     if active_prompt:
-        # Automatically mark voice engine as activated if they skipped the boot button and typed directly
-        st.session_state.vocal_matrix_initialized = True
-        
         sys_instruction = (
             "You are JARVIS, an advanced deep-space intelligence created entirely by the programmer Prajith. "
             "You speak with a highly intelligent, polite British accent. "
