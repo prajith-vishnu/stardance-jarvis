@@ -14,8 +14,12 @@ YELLOW = "\033[1;33m"
 BOLD = "\033[1m"
 RESET = "\033[0m"
 
+# Global NASA Security Token Configuration
+NASA_KEY = "f4trKrT0Tdm2cxhjPb8knUQFdf9e0sFYRP5PdOzW"
+
 def fetch_nasa_briefing():
-    nasa_url = "https://api.nasa.gov/planetary/apod?api_key=f4trKrT0Tdm2cxhjPb8knUQFdf9e0sFYRP5PdOzW"
+    """Array 1: Astronomy Picture of the Day."""
+    nasa_url = f"https://api.nasa.gov/planetary/apod?api_key={NASA_KEY}"
     try:
         response = requests.get(nasa_url)
         if response.status_code == 200:
@@ -26,27 +30,41 @@ def fetch_nasa_briefing():
         return None, f"Connection error: {e}"
 
 def fetch_mars_telemetry():
-    url = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&page=1&api_key=f4trKrT0Tdm2cxhjPb8knUQFdf9e0sFYRP5PdOzW"
+    """Array 2: Live Curiosity Rover Mission Data with Diagnostics."""
+    url = f"https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&page=1&api_key={NASA_KEY}"
     try:
         response = requests.get(url)
-        if response.status_code == 200:
-            photos = response.json().get("photos", [])
-            if photos:
-                sample = photos[0]
-                return {
-                    "rover": sample["rover"]["name"],
-                    "status": sample["rover"]["status"],
-                    "camera": sample["camera"]["full_name"],
-                    "image": sample["img_src"],
-                    "launch": sample["rover"]["launch_date"]
-                }
-        return None
-    except Exception:
+        
+        # Diagnostic Check 1: Token rejection or 403/404 handling
+        if response.status_code != 200:
+            print(f"\n{RED}[DIAGNOSTIC]: NASA server returned HTTP Code {response.status_code}")
+            print(f"[DIAGNOSTIC]: Server payload: {response.text}{RESET}\n")
+            return None
+            
+        data = response.json()
+        photos = data.get("photos", [])
+        
+        # Diagnostic Check 2: Connection good but payload blank
+        if not photos:
+            print(f"\n{RED}[DIAGNOSTIC]: Connection 200 OK, but photos list is empty for Sol 1000.{RESET}\n")
+            return None
+            
+        sample = photos[0]
+        return {
+            "rover": sample["rover"]["name"],
+            "status": sample["rover"]["status"],
+            "camera": sample["camera"]["full_name"],
+            "image": sample["img_src"],
+            "launch": sample["rover"]["launch_date"]
+        }
+    except Exception as e:
+        print(f"\n{RED}[DIAGNOSTIC]: Python execution failure: {e}{RESET}\n")
         return None
 
 def fetch_asteroid_telemetry():
+    """Array 3: Near-Earth Object Detection System."""
     today = datetime.today().strftime('%Y-%m-%d')
-    url = f"https://api.nasa.gov/neo/rest/v1/feed?start_date={today}&end_date={today}&api_key=f4trKrT0Tdm2cxhjPb8knUQFdf9e0sFYRP5PdOzW"
+    url = f"https://api.nasa.gov/neo/rest/v1/feed?start_date={today}&end_date={today}&api_key={NASA_KEY}"
     try:
         response = requests.get(url)
         if response.status_code == 200:
@@ -67,6 +85,7 @@ def fetch_asteroid_telemetry():
         return None
 
 def jarvis_speak(text):
+    """Vocalizer Subsystem."""
     clean_text = text.replace("*", "").replace("[", "").replace("]", "")
     try:
         subprocess.Popen(['say', '-v', 'Daniel', clean_text])
@@ -74,7 +93,7 @@ def jarvis_speak(text):
         print(f"{RED}Vocalizer error: {e}{RESET}")
 
 def print_boot_banner():
-    """Prints a sci-fi mission control terminal banner."""
+    """Sci-Fi Mission Control Terminal Banner."""
     print(f"{GREEN}{BOLD}")
     print("=====================================================================")
     print("      _  _______     _____ ___ ____    __  __          _ _        ")
@@ -95,7 +114,6 @@ def start_jarvis():
     print_boot_banner()
     client = genai.Client()
     
-    # Updated prompt to put JARVIS in absolute Mission Control mode
     system_instruction = """
     You are JARVIS, Tony Stark's advanced AI assistant, currently acting as the Lead Tactical Flight Controller for a NASA Deep Space Mission. 
     You are brilliant, British, crisp, and serious about mission safety.
@@ -117,7 +135,6 @@ def start_jarvis():
     print(f"{YELLOW}COMMAND OPTIONS: 'briefing' | 'mars' | 'asteroids' | 'shutdown' | or input text.{RESET}\n")
     
     while True:
-        # User input glows neon cyan
         user_input = input(f"{CYAN}{BOLD}COMMANDER@NASA_HUD // {RESET}").strip()
         if not user_input:
             continue
