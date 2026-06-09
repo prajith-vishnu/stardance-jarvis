@@ -177,13 +177,12 @@ if "chat_history" not in st.session_state:
     ]
 if "last_processed_audio" not in st.session_state:
     st.session_state.last_processed_audio = None
+if "text_to_speak" not in st.session_state:
+    st.session_state.text_to_speak = None
 
-# =====================================================================
-# PRODUCTION VALUE SECURE GATEWAY CHECK
-# =====================================================================
+# Secure Credentials Vault Verification
 if "GEMINI_API_KEY" not in st.secrets or "NASA_API_KEY" not in st.secrets:
     st.error("🔒 SYSTEM CONFIGURATION INTERCEPTED: Deployment environment secrets missing.")
-    st.info("Ensure GEMINI_API_KEY and NASA_API_KEY are configured in your hosting panel or local secrets.toml file.")
     st.stop()
 
 NASA_KEY = st.secrets["NASA_API_KEY"]
@@ -272,7 +271,7 @@ with left_deck:
     
     st.markdown("### Terminal Feed Stream")
     
-    # Perfectly scaled viewport window
+    # Render scrollable history box
     with st.container(height=360):
         for user_type, stream_log in st.session_state.chat_history:
             if user_type == "COMMANDER":
@@ -282,7 +281,7 @@ with left_deck:
                 
     st.write("")
     
-    # Horizontally bounded dual inputs
+    # Horizontally bounded inputs
     input_col, audio_col = st.columns([3.5, 1.5], vertical_alignment="bottom")
     
     with input_col:
@@ -327,4 +326,37 @@ with left_deck:
             st.session_state.chat_history.append(("COMMANDER", clean_display_prompt))
             st.session_state.chat_history.append(("JARVIS CORE", response_text))
             
+            # Stages the textual data string to execute on the impending page refresh loop
+            st.session_state.text_to_speak = response_text
             st.rerun()
+
+    # =====================================================================
+    # 🔊 LIVE SPEECH SYNTHESIS ENGINE INTERCEPT
+    # =====================================================================
+    if st.session_state.text_to_speak:
+        # Escapes character markers so JavaScript handles string structures cleanly
+        safe_speech_string = st.session_state.text_to_speak.replace('"', '\\"').replace('\n', ' ')
+        
+        # Injects client-side HTML component executing browser audio layers directly
+        tts_javascript_matrix = f"""
+        <script>
+            if ('speechSynthesis' in window) {{
+                window.speechSynthesis.cancel(); // Clears trailing speaker pipelines
+                var metric_voice_packet = new SpeechSynthesisUtterance("{safe_speech_string}");
+                
+                // Targets systemic localized audio profiles (Tries to locate an english accent)
+                var fallback_system_voices = window.speechSynthesis.getVoices();
+                var selected_voice = fallback_system_voices.find(voice => voice.lang.includes('en-GB') || voice.name.includes('Daniel'));
+                if (selected_voice) {{
+                    metric_voice_packet.voice = selected_voice;
+                }}
+                
+                metric_voice_packet.rate = 1.05; // Slightly faster pacing to match cinematic velocity
+                metric_voice_packet.pitch = 0.95; // Slightly lower pitch tuning
+                window.speechSynthesis.speak(metric_voice_packet);
+            }}
+        </script>
+        """
+        # Triggers script action transparently on user screen element layer
+        st.components.v1.html(tts_javascript_matrix, height=0)
+        st.session_state.text_to_speak = None # Clear structural buffer to avoid repeating on idle ticks
