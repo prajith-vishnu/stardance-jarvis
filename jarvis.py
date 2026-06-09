@@ -1,5 +1,8 @@
-import requests
+import os
 import sys
+import subprocess
+import requests
+from google import genai
 
 def fetch_nasa_briefing():
     """Fetches today's space data from NASA."""
@@ -14,30 +17,80 @@ def fetch_nasa_briefing():
     except Exception as e:
         return None, f"Connection error: {e}"
 
+def jarvis_speak(text):
+    """Uses the native macOS 'say' command to make JARVIS talk."""
+    # Remove markdown bolding asterisks so JARVIS doesn't try to pronounce them
+    clean_text = text.replace("*", "")
+    try:
+        # This tells your Mac to use its built-in text-to-speech engine
+        subprocess.Popen(['say', clean_text])
+    except Exception as e:
+        print(f"Text-to-speech subsystem failure: {e}")
+
+def ask_jarvis_ai(prompt_context):
+    """Passes context to Gemini to respond in JARVIS's distinct personality."""
+    try:
+        client = genai.Client()
+        system_prompt = f"""
+        You are JARVIS, Tony Stark's advanced AI assistant from Iron Man. 
+        You are sophisticated, brilliant, British, and deeply polite. You must always address the user as 'sir'.
+        Keep your responses clean, short, and intelligent. 
+        CRITICAL: Since your text will be read out loud, keep your answers under 3 sentences maximum so you do not drag on.
+        
+        Task context:
+        {prompt_context}
+        """
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=system_prompt,
+        )
+        return response.text
+    except Exception as e:
+        return f"Apologies, sir. My cognitive subroutines encountered an error: {e}"
+
 def start_jarvis():
-    print("JARVIS: Systems online. Core heuristics initialized.")
-    print("JARVIS: Type 'briefing' for space data, or 'shutdown' to exit.\n")
+    if not os.environ.get("GEMINI_API_KEY"):
+        print("ALERT: JARVIS cannot find the GEMINI_API_KEY environment variable.")
+        return
+
+    print("JARVIS: Audio matrices active. Vocal synthesizers initialized.")
+    jarvis_speak("Systems online, sir. Vocal synthesizers initialized.")
+    print("JARVIS: Type 'briefing', 'shutdown', or speak with me.\n")
     
     while True:
-        # This keeps the program running and waits for your input
-        user_input = input("YOU: ").strip().lower()
-        
-        if user_input == "shutdown":
-            print("\nJARVIS: Powering down thrusters. Goodbye, sir.")
+        user_input = input("YOU: ").strip()
+        if not user_input:
+            continue
+            
+        if user_input.lower() == "shutdown":
+            print("\nJARVIS: Powering down thrusters. Safe travels, sir.")
+            jarvis_speak("Powering down thrusters. Safe travels, sir.")
             sys.exit()
             
-        elif user_input == "briefing":
-            print("\nJARVIS: Accessing NASA archives...")
+        elif user_input.lower() == "briefing":
+            print("\nJARVIS: Accessing NASA archives and processing telemetry...")
+            jarvis_speak("Accessing NASA archives and processing telemetry, please standby.")
             title, explanation = fetch_nasa_briefing()
             
             if title:
-                print(f"\n[JARVIS]: Today's briefing is on '{title}'.")
-                print(f"\"{explanation}\"\n")
+                context = f"Summarize this NASA data in 2 concise sentences as JARVIS. Title: {title}. Description: {explanation}"
+                jarvis_response = ask_jarvis_ai(context)
+                
+                print(f"\n==================================================")
+                print(f"JARVIS DATA UPLINK: {title.upper()}")
+                print(f"==================================================")
+                print(f"{jarvis_response}")
+                print(f"==================================================\n")
+                jarvis_speak(jarvis_response)
             else:
-                print(f"\n[JARVIS]: Alert. {explanation}\n")
+                print(f"\n[JARVIS]: Alert. Unable to fetch telemetry.\n")
                 
         else:
-            print(f"\n[JARVIS]: I am programmed for orbital data, sir. Command '{user_input}' not recognized. Try 'briefing' or 'shutdown'.\n")
+            print("\nJARVIS: Processing...")
+            context = f"The user just said: '{user_input}'. Respond to them naturally as their AI assistant in under 3 sentences."
+            jarvis_response = ask_jarvis_ai(context)
+            print(f"\nJARVIS: {jarvis_response}\n")
+            jarvis_speak(jarvis_response)
 
 if __name__ == "__main__":
     start_jarvis()
