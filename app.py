@@ -165,6 +165,21 @@ div[data-testid="stChatInput"] textarea {
     border-color: #00E5FF !important;
     color: #00E5FF !important;
 }
+
+/* Specialized High-Tech Boot Button Style Customization */
+.boot-container div button {
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.15) 0%, rgba(0, 102, 255, 0.2) 100%) !important;
+    border: 1px solid #00E5FF !important;
+    color: #00E5FF !important;
+    font-weight: 600 !important;
+    letter-spacing: 1px !important;
+    text-align: center !important;
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.2) !important;
+}
+.boot-container div button:hover {
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.25) 0%, rgba(0, 102, 255, 0.4) 100%) !important;
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.4) !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -177,6 +192,8 @@ if "last_processed_audio" not in st.session_state:
     st.session_state.last_processed_audio = None
 if "text_to_speak" not in st.session_state:
     st.session_state.text_to_speak = None
+if "vocal_matrix_initialized" not in st.session_state:
+    st.session_state.vocal_matrix_initialized = False
 
 # Secure Credentials Vault Verification
 if "GEMINI_API_KEY" not in st.secrets or "NASA_API_KEY" not in st.secrets:
@@ -267,6 +284,17 @@ with left_deck:
     </div>
     """, unsafe_allow_html=True)
     
+    # SYSTEM AUDIO BYPASS INTERCEPT VALVE:
+    # If the user hasn't clicked initialize yet, show the high-visibility boot layout.
+    # Clicking this gives browser permission to play audio strings instantly.
+    if not st.session_state.vocal_matrix_initialized:
+        st.markdown("<div class='boot-container'>", unsafe_allow_html=True)
+        if st.button("⚡ INITIALIZE JARVIS VOCAL MATRIX"):
+            st.session_state.vocal_matrix_initialized = True
+            st.session_state.text_to_speak = "System online. Hello, I am JARVIS. I am an advanced deep-space communications AI designed and built by Prajith. My core is running in full NASA mode."
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+        
     st.markdown("### Terminal Feed Stream")
     
     # Render scrollable history box
@@ -308,7 +336,9 @@ with left_deck:
         active_prompt = user_input
 
     if active_prompt:
-        # THE NASA SYSTEM MATRIX: Mandates absolute space alignment, dynamic addressing, and remembers Prajith's authorship
+        # Automatically mark voice engine as activated if they skipped the boot button and typed directly
+        st.session_state.vocal_matrix_initialized = True
+        
         sys_instruction = (
             "You are JARVIS, an advanced deep-space intelligence created entirely by the programmer Prajith. "
             "You speak with a highly intelligent, polite British accent. "
