@@ -15,6 +15,13 @@ st.set_page_config(
 st.markdown("""<style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
+/* ── VIEWPORT LOCK — no page scroll ── */
+html,body{
+    height:100vh!important;overflow:hidden!important;
+}
+[data-testid="stAppViewContainer"]{overflow:hidden!important;}
+section[data-testid="stMain"],[data-testid="stMain"]{overflow:hidden!important;}
+
 *,*::before,*::after{box-sizing:border-box;}
 html,body,[data-testid="stAppViewContainer"],.stApp{
     background:#000!important;color:#64748B!important;
@@ -23,12 +30,12 @@ html,body,[data-testid="stAppViewContainer"],.stApp{
 [data-testid="stHeader"]{display:none!important;}
 [data-testid="stSidebar"]{display:none!important;}
 .block-container{
-    padding-top:28px!important;padding-bottom:12px!important;
+    padding-top:20px!important;padding-bottom:0!important;
     padding-left:44px!important;padding-right:44px!important;
-    max-width:100%!important;
+    max-width:100%!important;overflow:hidden!important;
 }
 
-/* Prism-inspired atmospheric glow */
+/* Atmospheric glow */
 .stApp::before{
     content:'';position:fixed;top:0;left:50%;transform:translateX(-50%);
     width:1600px;height:520px;
@@ -46,25 +53,25 @@ h1,h2,h3,h4,h5{
 .slbl{
     font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:600;
     color:rgba(14,165,233,.28);letter-spacing:3.5px;text-transform:uppercase;
-    display:block;margin:14px 0 9px;
+    display:block;margin:10px 0 8px;
 }
 
 /* ── ARC REACTOR ── */
-.orb-wrap{display:flex;flex-direction:column;align-items:center;padding:16px 0 8px;}
-.arc-r{position:relative;width:130px;height:130px;display:flex;align-items:center;justify-content:center;}
+.orb-wrap{display:flex;flex-direction:column;align-items:center;padding:8px 0 4px;}
+.arc-r{position:relative;width:120px;height:120px;display:flex;align-items:center;justify-content:center;}
 .arc-core{
-    width:34px;height:34px;
+    width:32px;height:32px;
     background:radial-gradient(circle at 33% 27%,#E0F2FE 0%,#38BDF8 28%,#0EA5E9 58%,#0369A1 100%);
     border-radius:50%;
     box-shadow:0 0 18px #0EA5E9,0 0 48px rgba(14,165,233,.68),0 0 95px rgba(14,165,233,.22);
     animation:cpulse 2.8s ease-in-out infinite;z-index:5;position:relative;
 }
 .arc-hex{
-    position:absolute;width:52px;height:52px;
+    position:absolute;width:50px;height:50px;
     border:1.5px solid rgba(14,165,233,.42);transform:rotate(45deg);z-index:4;
 }
 .arc-ring1{
-    position:absolute;width:78px;height:78px;border-radius:50%;
+    position:absolute;width:74px;height:74px;border-radius:50%;
     border:1.5px solid rgba(14,165,233,.3);animation:rspin 5s linear infinite;z-index:3;
 }
 .arc-ring1::before{
@@ -73,7 +80,7 @@ h1,h2,h3,h4,h5{
     box-shadow:0 0 15px #0EA5E9,0 0 30px rgba(14,165,233,.45);
 }
 .arc-ring2{
-    position:absolute;width:106px;height:106px;border-radius:50%;
+    position:absolute;width:100px;height:100px;border-radius:50%;
     border:1px solid rgba(14,165,233,.11);animation:rspin 11s linear infinite reverse;z-index:2;
 }
 .arc-ring2::before{
@@ -82,7 +89,7 @@ h1,h2,h3,h4,h5{
     box-shadow:0 0 9px rgba(14,165,233,.3);
 }
 .arc-ring3{
-    position:absolute;width:130px;height:130px;border-radius:50%;
+    position:absolute;width:120px;height:120px;border-radius:50%;
     border:1px solid rgba(14,165,233,.045);animation:rspin 21s linear infinite;z-index:1;
 }
 .arc-ring3::before{
@@ -97,7 +104,7 @@ h1,h2,h3,h4,h5{
 .orb-lbl{
     font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:4px;
     color:rgba(14,165,233,.3);text-transform:uppercase;
-    margin-top:13px;display:flex;align-items:center;gap:6px;
+    margin-top:8px;display:flex;align-items:center;gap:6px;
 }
 .sdot{
     width:5px;height:5px;background:#10B981;border-radius:50%;
@@ -108,16 +115,16 @@ h1,h2,h3,h4,h5{
 /* ── HEADER ── */
 .hbar{
     display:flex;align-items:center;justify-content:space-between;
-    padding-bottom:18px;
+    padding-bottom:14px;
 }
 .spectrum{
     height:1px;
     background:linear-gradient(90deg,transparent 0%,rgba(14,165,233,.32) 22%,rgba(99,102,241,.22) 55%,rgba(14,165,233,.08) 82%,transparent 100%);
-    margin-bottom:24px;
+    margin-bottom:14px;
 }
-.brand{display:flex;flex-direction:column;gap:5px;}
+.brand{display:flex;flex-direction:column;gap:4px;}
 .bname{
-    font-family:'Inter',sans-serif;font-size:32px;font-weight:900;
+    font-family:'Inter',sans-serif;font-size:30px;font-weight:900;
     color:#fff;letter-spacing:-2.5px;line-height:1;
     text-shadow:0 0 50px rgba(14,165,233,.1);
 }
@@ -145,38 +152,49 @@ h1,h2,h3,h4,h5{
 .dx{background:#475569;}
 .psep{width:1px;height:14px;background:rgba(255,255,255,.05);}
 
-/* ── MISSION STATUS BAR ── */
-.mbar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
-.mc{
-    padding:18px 22px;border-radius:14px;
-    background:rgba(255,255,255,.009);
-    border:1px solid rgba(255,255,255,.038);
+/* ── MISSION STATUS STRIP ── */
+.mstrip{
+    display:flex;align-items:stretch;
+    border-top:1px solid rgba(255,255,255,.04);
+    border-bottom:1px solid rgba(255,255,255,.04);
+    margin-bottom:14px;
 }
-.mc-lbl{
-    font-family:'JetBrains Mono',monospace;font-size:7px;font-weight:600;
-    color:rgba(148,163,184,.28);letter-spacing:2.5px;text-transform:uppercase;
-    margin-bottom:6px;
+.ms-item{
+    display:flex;flex-direction:column;justify-content:center;gap:3px;
+    padding:10px 28px 10px 0;flex:1;
+    border-right:1px solid rgba(255,255,255,.04);
+    margin-right:28px;
 }
-.mc-val{
-    font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:600;
-    letter-spacing:-1px;line-height:1;color:#F8FAFC;
+.ms-item:last-child{border-right:none;margin-right:0;padding-right:0;}
+.ms-val{
+    font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:600;
+    letter-spacing:-1px;line-height:1;
 }
-.mc-val-b{color:#38BDF8;}
-.mc-val-r{color:#F87171;}
-.mc-val-g{color:#34D399;}
-.mc-val-a{color:#FBBF24;}
-.mc-sub{
+.ms-b{color:#38BDF8;}
+.ms-r{color:#F87171;}
+.ms-g{color:#34D399;}
+.ms-a{color:#FBBF24;}
+.ms-w{color:#F8FAFC;}
+.ms-lbl{
     font-family:'JetBrains Mono',monospace;font-size:7px;
-    color:rgba(148,163,184,.22);letter-spacing:.5px;margin-top:5px;
+    color:rgba(148,163,184,.25);letter-spacing:1px;text-transform:uppercase;
 }
-.mc-time{font-size:20px;letter-spacing:-0.5px;}
 
-/* ── CONTAINERS ── */
+/* ── CONTAINERS — viewport-locked heights ── */
 [data-testid="stVerticalBlockBorderCard"]{
     background:rgba(255,255,255,.009)!important;
     border:1px solid rgba(255,255,255,.042)!important;
     border-radius:16px!important;
     box-shadow:0 12px 48px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.025)!important;
+    overflow-y:auto!important;
+}
+/* Left display panel */
+[data-testid="stHorizontalBlock"] > [data-testid="column"]:nth-child(1) [data-testid="stVerticalBlockBorderCard"]{
+    height:calc(100vh - 278px)!important;
+}
+/* Right chat panel */
+[data-testid="stHorizontalBlock"] > [data-testid="column"]:nth-child(2) [data-testid="stVerticalBlockBorderCard"]{
+    height:calc(100vh - 358px)!important;
 }
 
 /* ── METRICS ── */
@@ -200,14 +218,14 @@ h1,h2,h3,h4,h5{
     font-size:7.5px!important;color:rgba(14,165,233,.35)!important;
 }
 
-/* ── MISSION BUTTONS ── */
+/* ── BUTTONS ── */
 .stButton>button{
     background:rgba(255,255,255,.01)!important;color:#374151!important;
     font-family:'JetBrains Mono',monospace!important;font-weight:600!important;
     font-size:7.5px!important;letter-spacing:1.5px!important;text-transform:uppercase!important;
     border:1px solid rgba(255,255,255,.042)!important;border-radius:10px!important;
-    padding:13px 6px!important;width:100%!important;text-align:center!important;
-    transition:all .16s cubic-bezier(.4,0,.2,1)!important;line-height:1.65!important;
+    padding:10px 6px!important;width:100%!important;text-align:center!important;
+    transition:all .16s cubic-bezier(.4,0,.2,1)!important;line-height:1.55!important;
 }
 .stButton>button:hover{
     background:rgba(14,165,233,.035)!important;
@@ -237,8 +255,6 @@ h1,h2,h3,h4,h5{
     background:rgba(14,165,233,.03);border:1px solid rgba(14,165,233,.075);
     color:#CBD5E1;margin-right:20%;border-bottom-left-radius:4px;
 }
-
-/* ── CHAT INPUT ── */
 div[data-testid="stChatInput"]{
     background:rgba(255,255,255,.016)!important;
     border:1px solid rgba(255,255,255,.055)!important;border-radius:12px!important;
@@ -250,14 +266,13 @@ div[data-testid="stChatInput"]:focus-within{
 div[data-testid="stChatInput"] textarea{
     color:#E2E8F0!important;font-size:13px!important;font-family:'Inter',sans-serif!important;
 }
-
 [data-testid="stImage"] img{
     border-radius:12px!important;border:1px solid rgba(255,255,255,.042)!important;
 }
 
 /* ── EVENTS ── */
 .ev-card{
-    padding:12px 16px;margin-bottom:6px;border-radius:10px;
+    padding:11px 14px;margin-bottom:6px;border-radius:10px;
     background:rgba(255,255,255,.01);border:1px solid rgba(255,255,255,.032);
     display:flex;align-items:center;gap:12px;
 }
@@ -270,7 +285,6 @@ div[data-testid="stChatInput"] textarea{
 .ec-vol{background:rgba(245,158,11,.07);color:#FCD34D;border:1px solid rgba(245,158,11,.14);}
 .ec-def{background:rgba(14,165,233,.05);color:#7DD3FC;border:1px solid rgba(14,165,233,.12);}
 .ev-ttl{font-size:12px;color:#94A3B8;font-family:'Inter',sans-serif;}
-
 .dcapt{
     font-family:'JetBrains Mono',monospace;font-size:8px;
     color:rgba(148,163,184,.28);letter-spacing:.8px;margin-top:8px;line-height:1.6;
@@ -461,32 +475,28 @@ st.markdown(f"""
 <div class="spectrum"></div>
 """, unsafe_allow_html=True)
 
-# ── Mission Status Bar ──
-neo_cls   = "mc-val-r" if ad["asteroids"]["hazardous"] > 0 else "mc-val-b"
-solar_cls = "mc-val-a" if ad["solar"]["active"] else "mc-val-g"
+# ── Compact Mission Strip ──
+neo_cls   = "ms-r" if ad["asteroids"]["hazardous"] > 0 else "ms-b"
+solar_cls = "ms-a" if ad["solar"]["active"] else "ms-g"
 solar_sub = f"CLASS {ad['solar']['class']} · LATEST FLARE" if ad["solar"]["active"] else "NO SIGNIFICANT ACTIVITY"
 
 st.markdown(f"""
-<div class="mbar">
-  <div class="mc">
-    <div class="mc-lbl">Near-Earth Objects Today</div>
-    <div class="mc-val {neo_cls}">{ad['asteroids']['count']}</div>
-    <div class="mc-sub">{ad['asteroids']['hazardous']} POTENTIALLY HAZARDOUS · CLOSEST {ad['asteroids']['closest_km']:,} KM</div>
+<div class="mstrip">
+  <div class="ms-item">
+    <div class="ms-val {neo_cls}">{ad['asteroids']['count']}</div>
+    <div class="ms-lbl">Near-Earth Objects · {ad['asteroids']['hazardous']} Hazardous · Closest {ad['asteroids']['closest_km']:,} km</div>
   </div>
-  <div class="mc">
-    <div class="mc-lbl">Crew In Space</div>
-    <div class="mc-val mc-val-b">{ad['people_count']}</div>
-    <div class="mc-sub">ACTIVE MISSION PERSONNEL · OPEN NOTIFY</div>
+  <div class="ms-item">
+    <div class="ms-val ms-b">{ad['people_count']}</div>
+    <div class="ms-lbl">Crew In Space · Active Mission Personnel</div>
   </div>
-  <div class="mc">
-    <div class="mc-lbl">Solar Flares · 7 Days</div>
-    <div class="mc-val {solar_cls}">{ad['solar']['count']}</div>
-    <div class="mc-sub">{solar_sub}</div>
+  <div class="ms-item">
+    <div class="ms-val {solar_cls}">{ad['solar']['count']}</div>
+    <div class="ms-lbl">Solar Flares · 7 Days · {solar_sub}</div>
   </div>
-  <div class="mc">
-    <div class="mc-lbl">Mission Clock</div>
-    <div class="mc-val mc-time" style="color:#F8FAFC;">{datetime.utcnow().strftime('%H:%M:%S')}</div>
-    <div class="mc-sub">{datetime.utcnow().strftime('%Y · %b %d')} · COORDINATED UNIVERSAL TIME</div>
+  <div class="ms-item">
+    <div class="ms-val ms-w" style="font-size:18px;">{datetime.utcnow().strftime('%H:%M:%S')}</div>
+    <div class="ms-lbl">Coordinated Universal Time · {datetime.utcnow().strftime('%Y-%m-%d')}</div>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -497,7 +507,7 @@ forced_prompt = ""
 
 # ── LEFT PANEL ──
 with left:
-    with st.container(height=430, border=True):
+    with st.container(height=2000, border=True):
         disp = st.session_state.display
 
         if disp["type"] in ("apod", "mars", "epic") and disp.get("img_url"):
@@ -568,7 +578,7 @@ with left:
                 st.metric("SOLAR FLARES / 7D", str(s["count"]), f"Latest class {s['class']}")
 
     st.markdown("""
-    <div style="display:flex;align-items:center;gap:10px;margin:14px 0 10px;">
+    <div style="display:flex;align-items:center;gap:10px;margin:10px 0 8px;">
         <span class='slbl' style='margin:0;white-space:nowrap'>MISSION DIRECTIVES</span>
         <div style="flex:1;height:1px;background:rgba(255,255,255,.035);"></div>
     </div>
@@ -577,7 +587,7 @@ with left:
     b1, b2, b3, b4, b5, b6 = st.columns(6, gap="small")
 
     with b1:
-        if st.button("📡\nASTRONOMY\nFEED"):
+        if st.button("ASTRONOMY\nFEED"):
             with st.spinner(""):
                 apod = get_apod()
                 if apod and apod.get("media_type") == "image":
@@ -587,7 +597,7 @@ with left:
                                      f"Title: {apod.get('title')}. "
                                      f"Detail: {apod.get('explanation','')[:400]}")
     with b2:
-        if st.button("🔴\nMARS\nSURFACE"):
+        if st.button("MARS\nSURFACE"):
             with st.spinner(""):
                 mars = get_mars_latest()
                 if mars:
@@ -598,7 +608,7 @@ with left:
                                      f"Sol {mars['sol']}, earth date {mars['date']}. Camera: {mars['camera']}. "
                                      f"Status: {mars['status']}. Give a crisp 2-sentence tactical surface report.")
     with b3:
-        if st.button("☄️\nTHREAT\nANALYSIS"):
+        if st.button("THREAT\nANALYSIS"):
             with st.spinner(""):
                 ast = get_asteroid_radar()
                 sol = get_solar_activity()
@@ -611,7 +621,7 @@ with left:
                                  f"SOLAR WEATHER: {solar_line}. "
                                  f"Deliver a 3-sentence integrated threat assessment correlating both datasets.")
     with b4:
-        if st.button("🛸\nISS\nTRACKER"):
+        if st.button("ISS\nTRACKER"):
             with st.spinner(""):
                 lat, lon = get_iss_position()
                 if lat is not None:
@@ -622,7 +632,7 @@ with left:
                                      f"Orbital altitude ~408 km, speed ~27,600 km/h. "
                                      f"Give a 2-sentence tactical position report.")
     with b5:
-        if st.button("☀️\nSOLAR\nWEATHER"):
+        if st.button("SOLAR\nWEATHER"):
             with st.spinner(""):
                 sol = get_solar_activity()
                 if sol:
@@ -631,7 +641,7 @@ with left:
                                      f"Latest class: {sol['class']}. Peak: {sol['peak']}. "
                                      f"Give a 2-sentence space weather briefing and mission advisory.")
     with b6:
-        if st.button("🌍\nEARTH\nEVENTS"):
+        if st.button("EARTH\nEVENTS"):
             with st.spinner(""):
                 events = get_earth_events()
                 if events:
@@ -659,7 +669,7 @@ with right:
     </div>
     """, unsafe_allow_html=True)
 
-    with st.container(height=390, border=True):
+    with st.container(height=2000, border=True):
         for speaker, msg in st.session_state.chat_history:
             if speaker == "COMMANDER":
                 st.markdown(
@@ -677,8 +687,6 @@ with right:
                     f'</div>',
                     unsafe_allow_html=True
                 )
-
-    st.write("")
 
     input_col, mic_col = st.columns([3.5, 1.5], vertical_alignment="bottom")
     with input_col:
