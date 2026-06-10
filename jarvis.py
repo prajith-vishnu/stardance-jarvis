@@ -15,7 +15,10 @@ BOLD = "\033[1m"
 RESET = "\033[0m"
 
 # Global NASA Security Token Configuration
-NASA_KEY = "f4trKrT0Tdm2cxhjPb8knUQFdf9e0sFYRP5PdOzW"
+NASA_KEY = os.environ.get("NASA_API_KEY", "")
+if not NASA_KEY:
+    print(f"{RED}ALERT: NASA_API_KEY environment variable not set.{RESET}")
+    sys.exit(1)
 
 def fetch_nasa_briefing():
     """Array 1: Astronomy Picture of the Day."""
