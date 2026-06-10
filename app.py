@@ -15,13 +15,6 @@ st.set_page_config(
 st.markdown("""<style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-/* ── VIEWPORT LOCK — no page scroll ── */
-html,body{
-    height:100vh!important;overflow:hidden!important;
-}
-[data-testid="stAppViewContainer"]{overflow:hidden!important;}
-section[data-testid="stMain"],[data-testid="stMain"]{overflow:hidden!important;}
-
 *,*::before,*::after{box-sizing:border-box;}
 html,body,[data-testid="stAppViewContainer"],.stApp{
     background:#000!important;color:#64748B!important;
@@ -32,7 +25,7 @@ html,body,[data-testid="stAppViewContainer"],.stApp{
 .block-container{
     padding-top:20px!important;padding-bottom:0!important;
     padding-left:44px!important;padding-right:44px!important;
-    max-width:100%!important;overflow:hidden!important;
+    max-width:100%!important;
 }
 
 /* Atmospheric glow */
@@ -57,7 +50,7 @@ h1,h2,h3,h4,h5{
 }
 
 /* ── ARC REACTOR ── */
-.orb-wrap{display:flex;flex-direction:column;align-items:center;padding:8px 0 4px;}
+.orb-wrap{display:flex;flex-direction:column;align-items:center;padding:10px 0 6px;}
 .arc-r{position:relative;width:120px;height:120px;display:flex;align-items:center;justify-content:center;}
 .arc-core{
     width:32px;height:32px;
@@ -180,21 +173,12 @@ h1,h2,h3,h4,h5{
     color:rgba(148,163,184,.25);letter-spacing:1px;text-transform:uppercase;
 }
 
-/* ── CONTAINERS — viewport-locked heights ── */
+/* ── CONTAINERS ── */
 [data-testid="stVerticalBlockBorderCard"]{
     background:rgba(255,255,255,.009)!important;
     border:1px solid rgba(255,255,255,.042)!important;
     border-radius:16px!important;
     box-shadow:0 12px 48px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.025)!important;
-    overflow-y:auto!important;
-}
-/* Left display panel */
-[data-testid="stHorizontalBlock"] > [data-testid="column"]:nth-child(1) [data-testid="stVerticalBlockBorderCard"]{
-    height:calc(100vh - 278px)!important;
-}
-/* Right chat panel */
-[data-testid="stHorizontalBlock"] > [data-testid="column"]:nth-child(2) [data-testid="stVerticalBlockBorderCard"]{
-    height:calc(100vh - 358px)!important;
 }
 
 /* ── METRICS ── */
@@ -222,7 +206,7 @@ h1,h2,h3,h4,h5{
 .stButton>button{
     background:rgba(255,255,255,.01)!important;color:#374151!important;
     font-family:'JetBrains Mono',monospace!important;font-weight:600!important;
-    font-size:7.5px!important;letter-spacing:1.5px!important;text-transform:uppercase!important;
+    font-size:8px!important;letter-spacing:1.5px!important;text-transform:uppercase!important;
     border:1px solid rgba(255,255,255,.042)!important;border-radius:10px!important;
     padding:10px 6px!important;width:100%!important;text-align:center!important;
     transition:all .16s cubic-bezier(.4,0,.2,1)!important;line-height:1.55!important;
@@ -289,7 +273,6 @@ div[data-testid="stChatInput"] textarea{
     font-family:'JetBrains Mono',monospace;font-size:8px;
     color:rgba(148,163,184,.28);letter-spacing:.8px;margin-top:8px;line-height:1.6;
 }
-
 .stAlert{background:rgba(255,255,255,.01)!important;border:1px solid rgba(255,255,255,.04)!important;border-radius:10px!important;font-size:12px!important;}
 .stCaption p{font-family:'JetBrains Mono',monospace!important;font-size:7.5px!important;color:rgba(148,163,184,.25)!important;}
 [data-testid="stAudioInput"]{background:rgba(255,255,255,.01)!important;border:1px solid rgba(255,255,255,.042)!important;border-radius:10px!important;}
@@ -507,7 +490,7 @@ forced_prompt = ""
 
 # ── LEFT PANEL ──
 with left:
-    with st.container(height=2000, border=True):
+    with st.container(height=450, border=True):
         disp = st.session_state.display
 
         if disp["type"] in ("apod", "mars", "epic") and disp.get("img_url"):
@@ -669,7 +652,7 @@ with right:
     </div>
     """, unsafe_allow_html=True)
 
-    with st.container(height=2000, border=True):
+    with st.container(height=400, border=True):
         for speaker, msg in st.session_state.chat_history:
             if speaker == "COMMANDER":
                 st.markdown(
@@ -687,6 +670,8 @@ with right:
                     f'</div>',
                     unsafe_allow_html=True
                 )
+
+    st.write("")
 
     input_col, mic_col = st.columns([3.5, 1.5], vertical_alignment="bottom")
     with input_col:
