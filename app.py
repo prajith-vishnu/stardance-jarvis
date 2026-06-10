@@ -13,237 +13,277 @@ st.set_page_config(
 )
 
 st.markdown("""<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 *,*::before,*::after{box-sizing:border-box;}
-
 html,body,[data-testid="stAppViewContainer"],.stApp{
-    background:#060A15!important;color:#94A3B8!important;
+    background:#000!important;color:#64748B!important;
     font-family:'Inter',-apple-system,sans-serif!important;
 }
 [data-testid="stHeader"]{display:none!important;}
 [data-testid="stSidebar"]{display:none!important;}
 .block-container{
-    padding-top:20px!important;padding-bottom:8px!important;
-    padding-left:28px!important;padding-right:28px!important;
+    padding-top:28px!important;padding-bottom:12px!important;
+    padding-left:44px!important;padding-right:44px!important;
     max-width:100%!important;
 }
 
+/* Prism-inspired atmospheric glow */
 .stApp::before{
-    content:'';position:fixed;top:-220px;left:50%;transform:translateX(-50%);
-    width:900px;height:440px;
-    background:radial-gradient(ellipse,rgba(14,165,233,.05)0%,transparent 65%);
+    content:'';position:fixed;top:0;left:50%;transform:translateX(-50%);
+    width:1600px;height:520px;
+    background:
+        radial-gradient(ellipse 800px 260px at 50% -60px,rgba(14,165,233,.055) 0%,transparent 70%),
+        radial-gradient(ellipse 400px 160px at 68% -20px,rgba(99,102,241,.03) 0%,transparent 60%),
+        radial-gradient(ellipse 400px 160px at 32% -20px,rgba(56,189,248,.025) 0%,transparent 60%);
     pointer-events:none;z-index:0;
 }
 
 h1,h2,h3,h4,h5{
-    font-family:'Inter',sans-serif!important;color:#F1F5F9!important;
-    font-weight:600!important;letter-spacing:-0.3px!important;
+    font-family:'Inter',sans-serif!important;color:#F8FAFC!important;
+    font-weight:700!important;letter-spacing:-.5px!important;
 }
-
 .slbl{
-    font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;
-    color:rgba(14,165,233,.4);letter-spacing:2.5px;text-transform:uppercase;
-    display:block;margin:10px 0 8px;
+    font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:600;
+    color:rgba(14,165,233,.28);letter-spacing:3.5px;text-transform:uppercase;
+    display:block;margin:14px 0 9px;
 }
 
-/* Arc Reactor */
-.orb-wrap{display:flex;flex-direction:column;align-items:center;padding:8px 0 4px;}
-.arc-r{position:relative;width:72px;height:72px;display:flex;align-items:center;justify-content:center;}
+/* ── ARC REACTOR ── */
+.orb-wrap{display:flex;flex-direction:column;align-items:center;padding:16px 0 8px;}
+.arc-r{position:relative;width:130px;height:130px;display:flex;align-items:center;justify-content:center;}
 .arc-core{
-    width:20px;height:20px;
-    background:radial-gradient(circle at 35% 30%,#BAE6FD 0%,#0EA5E9 50%,#0369A1 100%);
+    width:34px;height:34px;
+    background:radial-gradient(circle at 33% 27%,#E0F2FE 0%,#38BDF8 28%,#0EA5E9 58%,#0369A1 100%);
     border-radius:50%;
-    box-shadow:0 0 10px #0EA5E9,0 0 25px rgba(14,165,233,.6),0 0 50px rgba(14,165,233,.2);
-    animation:cpulse 2.8s ease-in-out infinite;z-index:4;position:relative;
+    box-shadow:0 0 18px #0EA5E9,0 0 48px rgba(14,165,233,.68),0 0 95px rgba(14,165,233,.22);
+    animation:cpulse 2.8s ease-in-out infinite;z-index:5;position:relative;
 }
 .arc-hex{
-    position:absolute;width:30px;height:30px;
-    border:1px solid rgba(14,165,233,.45);transform:rotate(45deg);z-index:3;
+    position:absolute;width:52px;height:52px;
+    border:1.5px solid rgba(14,165,233,.42);transform:rotate(45deg);z-index:4;
 }
 .arc-ring1{
-    position:absolute;width:46px;height:46px;border-radius:50%;
-    border:1.5px solid rgba(14,165,233,.28);animation:rspin 5s linear infinite;z-index:2;
+    position:absolute;width:78px;height:78px;border-radius:50%;
+    border:1.5px solid rgba(14,165,233,.3);animation:rspin 5s linear infinite;z-index:3;
 }
 .arc-ring1::before{
-    content:'';position:absolute;top:-3px;left:calc(50% - 3px);
-    width:6px;height:6px;background:#0EA5E9;border-radius:50%;box-shadow:0 0 8px #0EA5E9;
+    content:'';position:absolute;top:-5px;left:calc(50% - 5px);
+    width:10px;height:10px;background:#0EA5E9;border-radius:50%;
+    box-shadow:0 0 15px #0EA5E9,0 0 30px rgba(14,165,233,.45);
 }
 .arc-ring2{
-    position:absolute;width:64px;height:64px;border-radius:50%;
-    border:1px solid rgba(14,165,233,.09);animation:rspin 11s linear infinite reverse;z-index:1;
+    position:absolute;width:106px;height:106px;border-radius:50%;
+    border:1px solid rgba(14,165,233,.11);animation:rspin 11s linear infinite reverse;z-index:2;
 }
 .arc-ring2::before{
-    content:'';position:absolute;top:-2px;left:calc(50% - 2px);
-    width:4px;height:4px;background:rgba(14,165,233,.35);border-radius:50%;
+    content:'';position:absolute;top:-3px;left:calc(50% - 3px);
+    width:6px;height:6px;background:rgba(14,165,233,.42);border-radius:50%;
+    box-shadow:0 0 9px rgba(14,165,233,.3);
+}
+.arc-ring3{
+    position:absolute;width:130px;height:130px;border-radius:50%;
+    border:1px solid rgba(14,165,233,.045);animation:rspin 21s linear infinite;z-index:1;
+}
+.arc-ring3::before{
+    content:'';position:absolute;top:calc(50% - 2.5px);left:-2.5px;
+    width:5px;height:5px;background:rgba(14,165,233,.25);border-radius:50%;
 }
 @keyframes cpulse{
-    0%,100%{transform:scale(.95);box-shadow:0 0 8px #0EA5E9,0 0 20px rgba(14,165,233,.5),0 0 40px rgba(14,165,233,.15);}
-    50%{transform:scale(1.06);box-shadow:0 0 14px #0EA5E9,0 0 35px rgba(14,165,233,.7),0 0 65px rgba(14,165,233,.25);}
+    0%,100%{transform:scale(.92);box-shadow:0 0 14px #0EA5E9,0 0 38px rgba(14,165,233,.58),0 0 75px rgba(14,165,233,.18);}
+    50%{transform:scale(1.09);box-shadow:0 0 24px #0EA5E9,0 0 65px rgba(14,165,233,.78),0 0 120px rgba(14,165,233,.28);}
 }
 @keyframes rspin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .orb-lbl{
-    font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:3px;
-    color:rgba(14,165,233,.4);text-transform:uppercase;
-    margin-top:9px;display:flex;align-items:center;gap:5px;
+    font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:4px;
+    color:rgba(14,165,233,.3);text-transform:uppercase;
+    margin-top:13px;display:flex;align-items:center;gap:6px;
 }
 .sdot{
     width:5px;height:5px;background:#10B981;border-radius:50%;
-    box-shadow:0 0 5px #10B981;animation:dblink 2s ease-in-out infinite;
+    box-shadow:0 0 7px #10B981;animation:dblink 2.2s ease-in-out infinite;
 }
-@keyframes dblink{0%,100%{opacity:1;}50%{opacity:.25;}}
+@keyframes dblink{0%,100%{opacity:1;}50%{opacity:.15;}}
 
-/* Header */
+/* ── HEADER ── */
 .hbar{
     display:flex;align-items:center;justify-content:space-between;
-    padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.05);
-    margin-bottom:16px;
+    padding-bottom:18px;
 }
-.brand{display:flex;flex-direction:column;gap:2px;}
-.bname{font-family:'Inter',sans-serif;font-size:21px;font-weight:800;color:#F1F5F9;letter-spacing:-0.8px;line-height:1;}
-.bname .a{color:#0EA5E9;}
-.bsub{font-family:'JetBrains Mono',monospace;font-size:7px;color:rgba(148,163,184,.3);letter-spacing:2.5px;text-transform:uppercase;}
-.pills{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.spectrum{
+    height:1px;
+    background:linear-gradient(90deg,transparent 0%,rgba(14,165,233,.32) 22%,rgba(99,102,241,.22) 55%,rgba(14,165,233,.08) 82%,transparent 100%);
+    margin-bottom:24px;
+}
+.brand{display:flex;flex-direction:column;gap:5px;}
+.bname{
+    font-family:'Inter',sans-serif;font-size:32px;font-weight:900;
+    color:#fff;letter-spacing:-2.5px;line-height:1;
+    text-shadow:0 0 50px rgba(14,165,233,.1);
+}
+.bname .a{color:#0EA5E9;text-shadow:0 0 25px rgba(14,165,233,.55);}
+.bsub{
+    font-family:'JetBrains Mono',monospace;font-size:6.5px;
+    color:rgba(148,163,184,.18);letter-spacing:4px;text-transform:uppercase;
+}
+.pills{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
 .pill{
     display:inline-flex;align-items:center;gap:5px;
-    font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;
-    padding:4px 10px 4px 7px;border-radius:6px;border:1px solid;white-space:nowrap;
+    font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:500;
+    padding:4px 10px 4px 7px;border-radius:20px;border:1px solid;white-space:nowrap;
 }
 .pd{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
-.pb{background:rgba(14,165,233,.07);border-color:rgba(14,165,233,.2);color:#7DD3FC;}
-.pr{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.25);color:#FCA5A5;}
-.pa{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.25);color:#FCD34D;}
-.pg{background:rgba(16,185,129,.07);border-color:rgba(16,185,129,.2);color:#6EE7B7;}
-.px{background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.07);color:#475569;}
-.db{background:#0EA5E9;box-shadow:0 0 4px #0EA5E9;}
-.dr{background:#EF4444;box-shadow:0 0 4px #EF4444;}
-.da{background:#F59E0B;box-shadow:0 0 4px #F59E0B;}
-.dg{background:#10B981;box-shadow:0 0 4px #10B981;}
+.pb{background:rgba(14,165,233,.05);border-color:rgba(14,165,233,.15);color:#7DD3FC;}
+.pr{background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.18);color:#FCA5A5;}
+.pa{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.18);color:#FCD34D;}
+.pg{background:rgba(16,185,129,.05);border-color:rgba(16,185,129,.15);color:#6EE7B7;}
+.px{background:rgba(255,255,255,.015);border-color:rgba(255,255,255,.05);color:#475569;}
+.db{background:#0EA5E9;box-shadow:0 0 5px #0EA5E9;}
+.dr{background:#EF4444;box-shadow:0 0 5px #EF4444;}
+.da{background:#F59E0B;box-shadow:0 0 5px #F59E0B;}
+.dg{background:#10B981;box-shadow:0 0 5px #10B981;}
 .dx{background:#475569;}
-.psep{width:1px;height:16px;background:rgba(255,255,255,.06);}
+.psep{width:1px;height:14px;background:rgba(255,255,255,.05);}
 
-/* Containers */
+/* ── MISSION STATUS BAR ── */
+.mbar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.mc{
+    padding:18px 22px;border-radius:14px;
+    background:rgba(255,255,255,.009);
+    border:1px solid rgba(255,255,255,.038);
+}
+.mc-lbl{
+    font-family:'JetBrains Mono',monospace;font-size:7px;font-weight:600;
+    color:rgba(148,163,184,.28);letter-spacing:2.5px;text-transform:uppercase;
+    margin-bottom:6px;
+}
+.mc-val{
+    font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:600;
+    letter-spacing:-1px;line-height:1;color:#F8FAFC;
+}
+.mc-val-b{color:#38BDF8;}
+.mc-val-r{color:#F87171;}
+.mc-val-g{color:#34D399;}
+.mc-val-a{color:#FBBF24;}
+.mc-sub{
+    font-family:'JetBrains Mono',monospace;font-size:7px;
+    color:rgba(148,163,184,.22);letter-spacing:.5px;margin-top:5px;
+}
+.mc-time{font-size:20px;letter-spacing:-0.5px;}
+
+/* ── CONTAINERS ── */
 [data-testid="stVerticalBlockBorderCard"]{
-    background:rgba(255,255,255,.018)!important;
-    border:1px solid rgba(255,255,255,.06)!important;
-    border-radius:12px!important;box-shadow:0 4px 32px rgba(0,0,0,.35)!important;
+    background:rgba(255,255,255,.009)!important;
+    border:1px solid rgba(255,255,255,.042)!important;
+    border-radius:16px!important;
+    box-shadow:0 12px 48px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.025)!important;
 }
 
-/* Metrics */
+/* ── METRICS ── */
 [data-testid="stMetric"]{
-    background:rgba(255,255,255,.022)!important;
-    border:1px solid rgba(255,255,255,.05)!important;
-    border-radius:8px!important;padding:12px 14px!important;
+    background:rgba(255,255,255,.014)!important;
+    border:1px solid rgba(255,255,255,.032)!important;
+    border-radius:10px!important;padding:14px 16px!important;
 }
 [data-testid="stMetricLabel"] p{
-    font-family:'JetBrains Mono',monospace!important;font-size:8px!important;
-    letter-spacing:1.8px!important;text-transform:uppercase!important;
-    color:rgba(148,163,184,.45)!important;
+    font-family:'JetBrains Mono',monospace!important;font-size:7px!important;
+    letter-spacing:2px!important;text-transform:uppercase!important;
+    color:rgba(148,163,184,.35)!important;
 }
 [data-testid="stMetricValue"]{
-    font-family:'JetBrains Mono',monospace!important;font-size:22px!important;
-    color:#F1F5F9!important;font-weight:600!important;
+    font-family:'JetBrains Mono',monospace!important;font-size:24px!important;
+    color:#F8FAFC!important;font-weight:600!important;
 }
 [data-testid="stMetricDelta"] svg{display:none!important;}
 [data-testid="stMetricDelta"]>div{
     font-family:'JetBrains Mono',monospace!important;
-    font-size:9px!important;color:rgba(14,165,233,.45)!important;
+    font-size:7.5px!important;color:rgba(14,165,233,.35)!important;
 }
 
-/* Buttons */
+/* ── MISSION BUTTONS ── */
 .stButton>button{
-    background:rgba(255,255,255,.02)!important;color:#475569!important;
-    font-family:'JetBrains Mono',monospace!important;font-weight:500!important;
-    font-size:9px!important;letter-spacing:.8px!important;
-    border:1px solid rgba(255,255,255,.06)!important;border-radius:8px!important;
-    padding:10px 6px!important;width:100%!important;text-align:center!important;
-    transition:all .15s cubic-bezier(.4,0,.2,1)!important;line-height:1.5!important;
+    background:rgba(255,255,255,.01)!important;color:#374151!important;
+    font-family:'JetBrains Mono',monospace!important;font-weight:600!important;
+    font-size:7.5px!important;letter-spacing:1.5px!important;text-transform:uppercase!important;
+    border:1px solid rgba(255,255,255,.042)!important;border-radius:10px!important;
+    padding:13px 6px!important;width:100%!important;text-align:center!important;
+    transition:all .16s cubic-bezier(.4,0,.2,1)!important;line-height:1.65!important;
 }
 .stButton>button:hover{
-    background:rgba(14,165,233,.05)!important;border-color:rgba(14,165,233,.22)!important;
-    color:#7DD3FC!important;
-    box-shadow:0 0 16px rgba(14,165,233,.07),0 2px 8px rgba(0,0,0,.2)!important;
+    background:rgba(14,165,233,.035)!important;
+    border-color:rgba(14,165,233,.18)!important;color:#7DD3FC!important;
+    box-shadow:0 0 22px rgba(14,165,233,.06),0 4px 16px rgba(0,0,0,.4)!important;
     transform:translateY(-1px)!important;
 }
 .stButton>button:active{transform:translateY(0)!important;}
 
-/* Boot button */
-.boot-wrap div button{
-    background:rgba(14,165,233,.04)!important;
-    border:1px solid rgba(14,165,233,.28)!important;color:#0EA5E9!important;
-    font-size:11px!important;font-weight:600!important;letter-spacing:3px!important;
-    padding:14px 24px!important;border-radius:8px!important;
-    box-shadow:0 0 28px rgba(14,165,233,.08),inset 0 0 16px rgba(14,165,233,.02)!important;
-    width:100%!important;
-}
-.boot-wrap div button:hover{
-    background:rgba(14,165,233,.09)!important;
-    box-shadow:0 0 45px rgba(14,165,233,.18),inset 0 0 16px rgba(14,165,233,.04)!important;
-    color:#BAE6FD!important;
-}
-
-/* Chat */
-.chat-row{margin-bottom:9px;}
+/* ── CHAT ── */
+.chat-row{margin-bottom:10px;}
 .chat-sndr{
-    font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;
-    letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px;padding:0 3px;
+    font-family:'JetBrains Mono',monospace;font-size:7px;font-weight:700;
+    letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;padding:0 4px;
 }
-.su{color:rgba(148,163,184,.35);text-align:right;}
-.sj{color:rgba(14,165,233,.5);}
-.chat-bbl{padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.65;font-family:'Inter',sans-serif;}
+.su{color:rgba(148,163,184,.25);text-align:right;}
+.sj{color:rgba(14,165,233,.38);}
+.chat-bbl{
+    padding:12px 16px;border-radius:14px;
+    font-size:13px;line-height:1.72;font-family:'Inter',sans-serif;
+}
 .cbu{
-    background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
-    color:#CBD5E1;margin-left:18%;border-bottom-right-radius:4px;
+    background:rgba(255,255,255,.018);border:1px solid rgba(255,255,255,.045);
+    color:#94A3B8;margin-left:20%;border-bottom-right-radius:4px;
 }
 .cbj{
-    background:rgba(14,165,233,.05);border:1px solid rgba(14,165,233,.1);
-    color:#E2E8F0;margin-right:18%;border-bottom-left-radius:4px;
+    background:rgba(14,165,233,.03);border:1px solid rgba(14,165,233,.075);
+    color:#CBD5E1;margin-right:20%;border-bottom-left-radius:4px;
 }
 
-/* Chat input */
+/* ── CHAT INPUT ── */
 div[data-testid="stChatInput"]{
-    background:rgba(255,255,255,.025)!important;
-    border:1px solid rgba(255,255,255,.08)!important;border-radius:10px!important;
+    background:rgba(255,255,255,.016)!important;
+    border:1px solid rgba(255,255,255,.055)!important;border-radius:12px!important;
 }
 div[data-testid="stChatInput"]:focus-within{
-    border-color:rgba(14,165,233,.28)!important;
-    box-shadow:0 0 0 3px rgba(14,165,233,.05)!important;
+    border-color:rgba(14,165,233,.2)!important;
+    box-shadow:0 0 0 3px rgba(14,165,233,.03)!important;
 }
 div[data-testid="stChatInput"] textarea{
     color:#E2E8F0!important;font-size:13px!important;font-family:'Inter',sans-serif!important;
 }
 
-[data-testid="stImage"] img{border-radius:10px!important;border:1px solid rgba(255,255,255,.06)!important;}
+[data-testid="stImage"] img{
+    border-radius:12px!important;border:1px solid rgba(255,255,255,.042)!important;
+}
 
-/* Events */
+/* ── EVENTS ── */
 .ev-card{
-    padding:10px 14px;margin-bottom:6px;border-radius:8px;
-    background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);
-    display:flex;align-items:center;gap:10px;
+    padding:12px 16px;margin-bottom:6px;border-radius:10px;
+    background:rgba(255,255,255,.01);border:1px solid rgba(255,255,255,.032);
+    display:flex;align-items:center;gap:12px;
 }
 .ev-cat{
-    font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;
-    letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;flex-shrink:0;
+    font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:700;
+    letter-spacing:1.2px;text-transform:uppercase;padding:3px 8px;border-radius:4px;flex-shrink:0;
 }
-.ec-fire{background:rgba(239,68,68,.1);color:#FCA5A5;border:1px solid rgba(239,68,68,.2);}
-.ec-storm{background:rgba(99,102,241,.1);color:#C7D2FE;border:1px solid rgba(99,102,241,.2);}
-.ec-vol{background:rgba(245,158,11,.1);color:#FCD34D;border:1px solid rgba(245,158,11,.2);}
-.ec-def{background:rgba(14,165,233,.08);color:#7DD3FC;border:1px solid rgba(14,165,233,.18);}
-.ev-ttl{font-size:12px;color:#CBD5E1;font-family:'Inter',sans-serif;}
+.ec-fire{background:rgba(239,68,68,.07);color:#FCA5A5;border:1px solid rgba(239,68,68,.14);}
+.ec-storm{background:rgba(99,102,241,.07);color:#C7D2FE;border:1px solid rgba(99,102,241,.14);}
+.ec-vol{background:rgba(245,158,11,.07);color:#FCD34D;border:1px solid rgba(245,158,11,.14);}
+.ec-def{background:rgba(14,165,233,.05);color:#7DD3FC;border:1px solid rgba(14,165,233,.12);}
+.ev-ttl{font-size:12px;color:#94A3B8;font-family:'Inter',sans-serif;}
 
 .dcapt{
-    font-family:'JetBrains Mono',monospace;font-size:9px;
-    color:rgba(148,163,184,.4);letter-spacing:.5px;margin-top:7px;line-height:1.5;
+    font-family:'JetBrains Mono',monospace;font-size:8px;
+    color:rgba(148,163,184,.28);letter-spacing:.8px;margin-top:8px;line-height:1.6;
 }
 
-.stAlert{background:rgba(255,255,255,.02)!important;border:1px solid rgba(255,255,255,.07)!important;border-radius:8px!important;font-size:12px!important;}
-.stCaption p{font-family:'JetBrains Mono',monospace!important;font-size:9px!important;color:rgba(148,163,184,.38)!important;}
-[data-testid="stAudioInput"]{background:rgba(255,255,255,.02)!important;border:1px solid rgba(255,255,255,.07)!important;border-radius:10px!important;}
+.stAlert{background:rgba(255,255,255,.01)!important;border:1px solid rgba(255,255,255,.04)!important;border-radius:10px!important;font-size:12px!important;}
+.stCaption p{font-family:'JetBrains Mono',monospace!important;font-size:7.5px!important;color:rgba(148,163,184,.25)!important;}
+[data-testid="stAudioInput"]{background:rgba(255,255,255,.01)!important;border:1px solid rgba(255,255,255,.042)!important;border-radius:10px!important;}
 .stSpinner>div{border-top-color:#0EA5E9!important;}
-::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar{width:2px;}
 ::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07);border-radius:3px;}
-::-webkit-scrollbar-thumb:hover{background:rgba(14,165,233,.2);}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.04);border-radius:2px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(14,165,233,.12);}
 </style>""", unsafe_allow_html=True)
 
 # ── Session State ──
@@ -251,7 +291,7 @@ _defaults = {
     "chat_history": [],
     "last_audio": None,
     "tts_text": None,
-    "booted": False,
+    "booted": True,
     "iss_pos": None,
     "display": {"type": "apod", "img_url": None, "title": None, "caption": None},
     "auto_data": None,
@@ -418,6 +458,37 @@ st.markdown(f"""
     <span class="pill px">{datetime.utcnow().strftime('%H:%M UTC')}</span>
   </div>
 </div>
+<div class="spectrum"></div>
+""", unsafe_allow_html=True)
+
+# ── Mission Status Bar ──
+neo_cls   = "mc-val-r" if ad["asteroids"]["hazardous"] > 0 else "mc-val-b"
+solar_cls = "mc-val-a" if ad["solar"]["active"] else "mc-val-g"
+solar_sub = f"CLASS {ad['solar']['class']} · LATEST FLARE" if ad["solar"]["active"] else "NO SIGNIFICANT ACTIVITY"
+
+st.markdown(f"""
+<div class="mbar">
+  <div class="mc">
+    <div class="mc-lbl">Near-Earth Objects Today</div>
+    <div class="mc-val {neo_cls}">{ad['asteroids']['count']}</div>
+    <div class="mc-sub">{ad['asteroids']['hazardous']} POTENTIALLY HAZARDOUS · CLOSEST {ad['asteroids']['closest_km']:,} KM</div>
+  </div>
+  <div class="mc">
+    <div class="mc-lbl">Crew In Space</div>
+    <div class="mc-val mc-val-b">{ad['people_count']}</div>
+    <div class="mc-sub">ACTIVE MISSION PERSONNEL · OPEN NOTIFY</div>
+  </div>
+  <div class="mc">
+    <div class="mc-lbl">Solar Flares · 7 Days</div>
+    <div class="mc-val {solar_cls}">{ad['solar']['count']}</div>
+    <div class="mc-sub">{solar_sub}</div>
+  </div>
+  <div class="mc">
+    <div class="mc-lbl">Mission Clock</div>
+    <div class="mc-val mc-time" style="color:#F8FAFC;">{datetime.utcnow().strftime('%H:%M:%S')}</div>
+    <div class="mc-sub">{datetime.utcnow().strftime('%Y · %b %d')} · COORDINATED UNIVERSAL TIME</div>
+  </div>
+</div>
 """, unsafe_allow_html=True)
 
 # ── Layout ──
@@ -426,11 +497,15 @@ forced_prompt = ""
 
 # ── LEFT PANEL ──
 with left:
-    with st.container(height=370, border=True):
+    with st.container(height=430, border=True):
         disp = st.session_state.display
 
         if disp["type"] in ("apod", "mars", "epic") and disp.get("img_url"):
-            type_label = {"apod": "NASA ASTRONOMY PICTURE OF THE DAY", "mars": "MARS CURIOSITY ROVER — LIVE SURFACE", "epic": "DSCOVR EPIC — FULL DISK EARTH"}.get(disp["type"], "LIVE IMAGE FEED")
+            type_label = {
+                "apod": "NASA ASTRONOMY PICTURE OF THE DAY",
+                "mars": "MARS CURIOSITY ROVER — LIVE SURFACE",
+                "epic": "DSCOVR EPIC — FULL DISK EARTH",
+            }.get(disp["type"], "LIVE IMAGE FEED")
             st.markdown(f"<span class='slbl'>{type_label}</span>", unsafe_allow_html=True)
             st.image(disp["img_url"], use_container_width=True)
             if disp.get("title"):
@@ -492,12 +567,17 @@ with left:
                 s = ad["solar"]
                 st.metric("SOLAR FLARES / 7D", str(s["count"]), f"Latest class {s['class']}")
 
-    st.markdown("<span class='slbl'>MISSION DIRECTIVES</span>", unsafe_allow_html=True)
-    r1c1, r1c2, r1c3 = st.columns(3)
-    r2c1, r2c2, r2c3 = st.columns(3)
+    st.markdown("""
+    <div style="display:flex;align-items:center;gap:10px;margin:14px 0 10px;">
+        <span class='slbl' style='margin:0;white-space:nowrap'>MISSION DIRECTIVES</span>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,.035);"></div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    with r1c1:
-        if st.button("📡 DEEP SPACE\nOPTICS"):
+    b1, b2, b3, b4, b5, b6 = st.columns(6, gap="small")
+
+    with b1:
+        if st.button("📡\nASTRONOMY\nFEED"):
             with st.spinner(""):
                 apod = get_apod()
                 if apod and apod.get("media_type") == "image":
@@ -506,8 +586,8 @@ with left:
                     forced_prompt = (f"Special Directive: Optical Briefing. "
                                      f"Title: {apod.get('title')}. "
                                      f"Detail: {apod.get('explanation','')[:400]}")
-    with r1c2:
-        if st.button("🔴 MARS ROVER\nSURFACE"):
+    with b2:
+        if st.button("🔴\nMARS\nSURFACE"):
             with st.spinner(""):
                 mars = get_mars_latest()
                 if mars:
@@ -517,8 +597,8 @@ with left:
                     forced_prompt = (f"Special Directive: Mars Surface. Live imaging from {mars['rover']} rover. "
                                      f"Sol {mars['sol']}, earth date {mars['date']}. Camera: {mars['camera']}. "
                                      f"Status: {mars['status']}. Give a crisp 2-sentence tactical surface report.")
-    with r1c3:
-        if st.button("☄️ THREAT\nANALYSIS"):
+    with b3:
+        if st.button("☄️\nTHREAT\nANALYSIS"):
             with st.spinner(""):
                 ast = get_asteroid_radar()
                 sol = get_solar_activity()
@@ -530,8 +610,8 @@ with left:
                                  f"Closest: {ast['closest_name']} at {ast['closest_km']:,} km. Threat: {threat}. "
                                  f"SOLAR WEATHER: {solar_line}. "
                                  f"Deliver a 3-sentence integrated threat assessment correlating both datasets.")
-    with r2c1:
-        if st.button("🛸 ISS LIVE\nTRACKER"):
+    with b4:
+        if st.button("🛸\nISS\nTRACKER"):
             with st.spinner(""):
                 lat, lon = get_iss_position()
                 if lat is not None:
@@ -541,8 +621,8 @@ with left:
                                      f"Station at {lat:.2f}° latitude, {lon:.2f}° longitude. "
                                      f"Orbital altitude ~408 km, speed ~27,600 km/h. "
                                      f"Give a 2-sentence tactical position report.")
-    with r2c2:
-        if st.button("☀️ SOLAR\nACTIVITY"):
+    with b5:
+        if st.button("☀️\nSOLAR\nWEATHER"):
             with st.spinner(""):
                 sol = get_solar_activity()
                 if sol:
@@ -550,8 +630,8 @@ with left:
                                      f"{sol['count']} solar flare events past 7 days. "
                                      f"Latest class: {sol['class']}. Peak: {sol['peak']}. "
                                      f"Give a 2-sentence space weather briefing and mission advisory.")
-    with r2c3:
-        if st.button("🌍 EARTH\nEVENTS"):
+    with b6:
+        if st.button("🌍\nEARTH\nEVENTS"):
             with st.spinner(""):
                 events = get_earth_events()
                 if events:
@@ -569,6 +649,7 @@ with right:
     st.markdown("""
     <div class="orb-wrap">
       <div class="arc-r">
+        <div class="arc-ring3"></div>
         <div class="arc-ring2"></div>
         <div class="arc-ring1"></div>
         <div class="arc-hex"></div>
@@ -578,7 +659,7 @@ with right:
     </div>
     """, unsafe_allow_html=True)
 
-    with st.container(height=385, border=True):
+    with st.container(height=390, border=True):
         for speaker, msg in st.session_state.chat_history:
             if speaker == "COMMANDER":
                 st.markdown(
@@ -599,34 +680,18 @@ with right:
 
     st.write("")
 
-    if not st.session_state.booted:
-        st.markdown("<div class='boot-wrap'>", unsafe_allow_html=True)
-        if st.button("⚡  INITIALIZE VOCAL MATRIX"):
-            st.session_state.booted = True
-            st.session_state.tts_text = (
-                "All systems nominal. JARVIS neural core online. "
-                "Good day. I am your Joint Artificial Reconnaissance and Vigilance Intelligence System, "
-                "built by Prajith. Running in full NASA mode."
-            )
-            st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
-        st.caption("Click above to enable voice output and terminal input")
-        user_input  = None
-        voice_input = None
-    else:
-        input_col, mic_col = st.columns([3.5, 1.5], vertical_alignment="bottom")
-        with input_col:
-            user_input = st.chat_input("Query NASA feeds or ask JARVIS anything...")
-        with mic_col:
-            voice_input = st.audio_input("", label_visibility="collapsed", key="mic")
+    input_col, mic_col = st.columns([3.5, 1.5], vertical_alignment="bottom")
+    with input_col:
+        user_input = st.chat_input("Query NASA feeds or ask JARVIS anything...")
+    with mic_col:
+        voice_input = st.audio_input("", label_visibility="collapsed", key="mic")
 
 # ── Inference Engine ──
     active_prompt = ""
 
     if forced_prompt:
         active_prompt = forced_prompt
-    elif (st.session_state.booted and voice_input
-          and voice_input.name != st.session_state.last_audio):
+    elif voice_input and voice_input.name != st.session_state.last_audio:
         try:
             st.session_state.last_audio = voice_input.name
             audio_bytes = voice_input.read()
