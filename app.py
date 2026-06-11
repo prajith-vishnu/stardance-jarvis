@@ -1,9 +1,17 @@
+import os
+from contextlib import contextmanager
 import streamlit as st
 import requests
 import pandas as pd
 from datetime import datetime, timedelta
 from google import genai
 from google.genai import types
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    pass
 
 st.set_page_config(
     page_title="J.A.R.V.I.S. // NASA CORE",
@@ -14,6 +22,20 @@ st.set_page_config(
 
 st.markdown("""<style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ── HIDE ALL STREAMLIT CHROME ── */
+#MainMenu{visibility:hidden!important;display:none!important;}
+footer{visibility:hidden!important;display:none!important;}
+[data-testid="stToolbar"]{display:none!important;}
+[data-testid="stDeployButton"]{display:none!important;}
+[data-testid="manage-app-button"]{display:none!important;}
+[data-testid="stDecoration"]{display:none!important;}
+[data-testid="stStatusWidget"]{display:none!important;}
+.viewerBadge_container__r5tak{display:none!important;}
+header{visibility:hidden!important;}
+.stDeployButton{display:none!important;}
+[class*="viewerBadge"]{display:none!important;}
+a[href*="streamlit.io"]{display:none!important;}
 
 *,*::before,*::after{box-sizing:border-box;}
 html,body,[data-testid="stAppViewContainer"],.stApp{
@@ -28,7 +50,6 @@ html,body,[data-testid="stAppViewContainer"],.stApp{
     max-width:100%!important;
 }
 
-/* Atmospheric glow */
 .stApp::before{
     content:'';position:fixed;top:0;left:50%;transform:translateX(-50%);
     width:1600px;height:520px;
@@ -49,59 +70,59 @@ h1,h2,h3,h4,h5{
     display:block;margin:10px 0 8px;
 }
 
-/* ── ARC REACTOR ── */
-.orb-wrap{display:flex;flex-direction:column;align-items:center;padding:10px 0 6px;}
-.arc-r{position:relative;width:120px;height:120px;display:flex;align-items:center;justify-content:center;}
+/* ── ARC REACTOR — compact corner badge, 30% smaller, chat visible without scroll ── */
+.orb-wrap{display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:12px;padding:0 6px 6px;}
+.arc-r{position:relative;width:62px;height:62px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .arc-core{
-    width:32px;height:32px;
+    width:17px;height:17px;
     background:radial-gradient(circle at 33% 27%,#E0F2FE 0%,#38BDF8 28%,#0EA5E9 58%,#0369A1 100%);
     border-radius:50%;
-    box-shadow:0 0 18px #0EA5E9,0 0 48px rgba(14,165,233,.68),0 0 95px rgba(14,165,233,.22);
+    box-shadow:0 0 10px #0EA5E9,0 0 26px rgba(14,165,233,.65),0 0 50px rgba(14,165,233,.2);
     animation:cpulse 2.8s ease-in-out infinite;z-index:5;position:relative;
 }
 .arc-hex{
-    position:absolute;width:50px;height:50px;
+    position:absolute;width:26px;height:26px;
     border:1.5px solid rgba(14,165,233,.42);transform:rotate(45deg);z-index:4;
 }
 .arc-ring1{
-    position:absolute;width:74px;height:74px;border-radius:50%;
+    position:absolute;width:39px;height:39px;border-radius:50%;
     border:1.5px solid rgba(14,165,233,.3);animation:rspin 5s linear infinite;z-index:3;
 }
 .arc-ring1::before{
-    content:'';position:absolute;top:-5px;left:calc(50% - 5px);
-    width:10px;height:10px;background:#0EA5E9;border-radius:50%;
-    box-shadow:0 0 15px #0EA5E9,0 0 30px rgba(14,165,233,.45);
+    content:'';position:absolute;top:-3px;left:calc(50% - 3px);
+    width:6px;height:6px;background:#0EA5E9;border-radius:50%;
+    box-shadow:0 0 10px #0EA5E9,0 0 20px rgba(14,165,233,.45);
 }
 .arc-ring2{
-    position:absolute;width:100px;height:100px;border-radius:50%;
+    position:absolute;width:51px;height:51px;border-radius:50%;
     border:1px solid rgba(14,165,233,.11);animation:rspin 11s linear infinite reverse;z-index:2;
 }
 .arc-ring2::before{
-    content:'';position:absolute;top:-3px;left:calc(50% - 3px);
-    width:6px;height:6px;background:rgba(14,165,233,.42);border-radius:50%;
-    box-shadow:0 0 9px rgba(14,165,233,.3);
+    content:'';position:absolute;top:-2px;left:calc(50% - 2px);
+    width:4px;height:4px;background:rgba(14,165,233,.42);border-radius:50%;
+    box-shadow:0 0 8px rgba(14,165,233,.3);
 }
 .arc-ring3{
-    position:absolute;width:120px;height:120px;border-radius:50%;
+    position:absolute;width:62px;height:62px;border-radius:50%;
     border:1px solid rgba(14,165,233,.045);animation:rspin 21s linear infinite;z-index:1;
 }
 .arc-ring3::before{
-    content:'';position:absolute;top:calc(50% - 2.5px);left:-2.5px;
-    width:5px;height:5px;background:rgba(14,165,233,.25);border-radius:50%;
+    content:'';position:absolute;top:calc(50% - 2px);left:-2px;
+    width:4px;height:4px;background:rgba(14,165,233,.25);border-radius:50%;
 }
 @keyframes cpulse{
-    0%,100%{transform:scale(.92);box-shadow:0 0 14px #0EA5E9,0 0 38px rgba(14,165,233,.58),0 0 75px rgba(14,165,233,.18);}
-    50%{transform:scale(1.09);box-shadow:0 0 24px #0EA5E9,0 0 65px rgba(14,165,233,.78),0 0 120px rgba(14,165,233,.28);}
+    0%,100%{transform:scale(.92);box-shadow:0 0 10px #0EA5E9,0 0 30px rgba(14,165,233,.55),0 0 60px rgba(14,165,233,.16);}
+    50%{transform:scale(1.09);box-shadow:0 0 18px #0EA5E9,0 0 52px rgba(14,165,233,.75),0 0 95px rgba(14,165,233,.25);}
 }
 @keyframes rspin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .orb-lbl{
-    font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:4px;
-    color:rgba(14,165,233,.3);text-transform:uppercase;
-    margin-top:8px;display:flex;align-items:center;gap:6px;
+    font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:4px;
+    color:rgba(14,165,233,.28);text-transform:uppercase;
+    display:flex;align-items:center;gap:5px;
 }
 .sdot{
     width:5px;height:5px;background:#10B981;border-radius:50%;
-    box-shadow:0 0 7px #10B981;animation:dblink 2.2s ease-in-out infinite;
+    box-shadow:0 0 6px #10B981;animation:dblink 2.2s ease-in-out infinite;
 }
 @keyframes dblink{0%,100%{opacity:1;}50%{opacity:.15;}}
 
@@ -172,6 +193,16 @@ h1,h2,h3,h4,h5{
     font-family:'JetBrains Mono',monospace;font-size:7px;
     color:rgba(148,163,184,.25);letter-spacing:1px;text-transform:uppercase;
 }
+.ms-status{
+    display:inline-block;font-family:'JetBrains Mono',monospace;font-size:7px;
+    font-weight:700;letter-spacing:1.5px;padding:2px 6px;border-radius:3px;
+    text-transform:uppercase;margin-top:2px;width:fit-content;
+}
+.ms-status-ok{background:rgba(16,185,129,.1);color:#34D399;border:1px solid rgba(16,185,129,.2);}
+.ms-status-warn{background:rgba(239,68,68,.1);color:#F87171;border:1px solid rgba(239,68,68,.2);}
+.ms-status-amber{background:rgba(245,158,11,.1);color:#FBBF24;border:1px solid rgba(245,158,11,.2);}
+.ms-status-dim{background:rgba(148,163,184,.06);color:#94A3B8;border:1px solid rgba(148,163,184,.14);}
+.ms-row{display:flex;gap:4px;flex-wrap:wrap;}
 
 /* ── CONTAINERS ── */
 [data-testid="stVerticalBlockBorderCard"]{
@@ -202,14 +233,15 @@ h1,h2,h3,h4,h5{
     font-size:7.5px!important;color:rgba(14,165,233,.35)!important;
 }
 
-/* ── BUTTONS ── */
+/* ── BUTTONS — no wrap, never breaks ── */
 .stButton>button{
     background:rgba(255,255,255,.01)!important;color:#374151!important;
     font-family:'JetBrains Mono',monospace!important;font-weight:600!important;
-    font-size:8px!important;letter-spacing:1.5px!important;text-transform:uppercase!important;
+    font-size:8px!important;letter-spacing:1px!important;text-transform:uppercase!important;
     border:1px solid rgba(255,255,255,.042)!important;border-radius:10px!important;
-    padding:10px 6px!important;width:100%!important;text-align:center!important;
-    transition:all .16s cubic-bezier(.4,0,.2,1)!important;line-height:1.55!important;
+    padding:11px 6px!important;width:100%!important;text-align:center!important;
+    white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+    transition:all .16s cubic-bezier(.4,0,.2,1)!important;
 }
 .stButton>button:hover{
     background:rgba(14,165,233,.035)!important;
@@ -273,10 +305,90 @@ div[data-testid="stChatInput"] textarea{
     font-family:'JetBrains Mono',monospace;font-size:8px;
     color:rgba(148,163,184,.28);letter-spacing:.8px;margin-top:8px;line-height:1.6;
 }
+
+/* ── ASTEROID CARDS (default panel) ── */
+.ast-card{
+    padding:11px 14px;margin-bottom:6px;border-radius:8px;
+    background:rgba(255,255,255,.01);border:1px solid rgba(255,255,255,.03);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.ast-name{
+    font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;
+    color:#CBD5E1;letter-spacing:.3px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.ast-data{
+    display:flex;align-items:center;gap:10px;flex-shrink:0;
+    font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(148,163,184,.4);letter-spacing:.3px;
+}
+.ast-badge{
+    padding:2px 7px;border-radius:3px;font-size:7px;font-weight:700;
+    letter-spacing:1px;text-transform:uppercase;
+}
+.ast-haz{background:rgba(239,68,68,.1);color:#FCA5A5;border:1px solid rgba(239,68,68,.18);}
+.ast-safe{background:rgba(16,185,129,.07);color:#6EE7B7;border:1px solid rgba(16,185,129,.15);}
+
 .stAlert{background:rgba(255,255,255,.01)!important;border:1px solid rgba(255,255,255,.04)!important;border-radius:10px!important;font-size:12px!important;}
 .stCaption p{font-family:'JetBrains Mono',monospace!important;font-size:7.5px!important;color:rgba(148,163,184,.25)!important;}
 [data-testid="stAudioInput"]{background:rgba(255,255,255,.01)!important;border:1px solid rgba(255,255,255,.042)!important;border-radius:10px!important;}
 .stSpinner>div{border-top-color:#0EA5E9!important;}
+
+/* ── ANIMATED STARFIELD — fills panel when no feed selected ── */
+.starfield{
+    position:relative;height:270px;border-radius:10px;overflow:hidden;
+    background:radial-gradient(ellipse at 50% 130%,rgba(14,165,233,.08),transparent 60%),#020409;
+    border:1px solid rgba(255,255,255,.03);margin-top:4px;
+}
+.sf-layer{
+    position:absolute;width:300%;height:300%;top:0;left:0;
+    background-image:
+        radial-gradient(1px 1px at 25px 35px,rgba(255,255,255,.9),transparent),
+        radial-gradient(1px 1px at 75px 120px,rgba(255,255,255,.5),transparent),
+        radial-gradient(1.6px 1.6px at 140px 60px,rgba(125,211,252,.85),transparent),
+        radial-gradient(1px 1px at 180px 165px,rgba(255,255,255,.4),transparent),
+        radial-gradient(1.2px 1.2px at 60px 185px,rgba(186,230,253,.6),transparent);
+    background-repeat:repeat;background-size:200px 200px;
+    animation:sfDrift 120s linear infinite,sfTwinkle 4s ease-in-out infinite alternate;
+}
+.sf-2{background-size:310px 310px;animation-duration:200s,6s;opacity:.55;}
+.sf-3{background-size:140px 140px;animation-duration:80s,3s;opacity:.8;}
+@keyframes sfDrift{from{transform:translate3d(0,0,0);}to{transform:translate3d(-200px,-120px,0);}}
+@keyframes sfTwinkle{from{opacity:.4;}to{opacity:1;}}
+.sf-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;z-index:2;}
+.sf-txt{
+    font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:3.5px;
+    color:rgba(125,211,252,.55);text-transform:uppercase;animation:dblink 3.2s ease-in-out infinite;
+}
+.sf-sub{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(148,163,184,.3);text-transform:uppercase;}
+
+/* ── JARVIS LOADING STATE — cycling mission text ── */
+.jload{display:flex;align-items:center;gap:12px;padding:12px 6px;}
+.jload-ring{
+    width:16px;height:16px;border-radius:50%;flex-shrink:0;
+    border:2px solid rgba(14,165,233,.15);border-top-color:#0EA5E9;
+    animation:rspin .9s linear infinite;
+}
+.jload-txt{position:relative;height:14px;flex:1;overflow:hidden;}
+.jload-txt span{
+    position:absolute;left:0;top:1px;white-space:nowrap;opacity:0;
+    font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;
+    color:#7DD3FC;text-transform:uppercase;
+    animation:jcycle 4.5s linear infinite;
+}
+.jload-txt span:nth-child(2){animation-delay:1.5s;}
+.jload-txt span:nth-child(3){animation-delay:3s;}
+@keyframes jcycle{0%{opacity:0;}6%{opacity:1;}30%{opacity:1;}36%{opacity:0;}100%{opacity:0;}}
+
+/* ── MOBILE ── */
+@media (max-width:740px){
+    .block-container{padding-left:16px!important;padding-right:16px!important;}
+    .bname{font-size:22px;letter-spacing:-1.5px;}
+    .pills{display:none;}
+    .mstrip{flex-wrap:wrap;}
+    .ms-item{flex:1 1 40%;padding-right:12px;margin-right:12px;}
+    .cbu{margin-left:6%;}
+    .cbj{margin-right:6%;}
+}
+
 ::-webkit-scrollbar{width:2px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.04);border-radius:2px;}
@@ -297,13 +409,42 @@ for k, v in _defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
 
-# ── Credentials ──
-if "GEMINI_API_KEY" not in st.secrets or "NASA_API_KEY" not in st.secrets:
-    st.error("SECRETS MISSING — add NASA_API_KEY and GEMINI_API_KEY to .streamlit/secrets.toml")
+# ── Credentials — Streamlit secrets (cloud) with .env fallback (local) ──
+def get_credential(name):
+    try:
+        if name in st.secrets:
+            return st.secrets[name]
+    except Exception:
+        pass
+    return os.environ.get(name, "")
+
+NASA_KEY   = get_credential("NASA_API_KEY")
+GEMINI_KEY = get_credential("GEMINI_API_KEY")
+
+if not NASA_KEY or not GEMINI_KEY:
+    st.error("CREDENTIALS MISSING — add NASA_API_KEY and GEMINI_API_KEY to .streamlit/secrets.toml (cloud) or a local .env file. See .env.example.")
     st.stop()
 
-NASA_KEY   = st.secrets["NASA_API_KEY"]
-GEMINI_KEY = st.secrets["GEMINI_API_KEY"]
+# ── JARVIS loading state — cycling mission text instead of stock spinner ──
+JARVIS_LOADER = """
+<div class="jload">
+  <div class="jload-ring"></div>
+  <div class="jload-txt">
+    <span>J.A.R.V.I.S. INITIALIZING NASA CORE...</span>
+    <span>ESTABLISHING LINK TO DEEP SPACE NETWORK...</span>
+    <span>DOWNLOADING MISSION DATA...</span>
+  </div>
+</div>
+"""
+
+@contextmanager
+def jarvis_loader():
+    ph = st.empty()
+    ph.markdown(JARVIS_LOADER, unsafe_allow_html=True)
+    try:
+        yield
+    finally:
+        ph.empty()
 
 # ── NASA API Functions ──
 def get_apod():
@@ -336,18 +477,34 @@ def get_asteroid_radar():
         }
     except: return {"count": 0, "hazardous": 0, "closest_name": "N/A", "closest_km": 0, "objects": []}
 
+def get_neo_week_avg():
+    """Average NEOs per day over the past 7 days, for status-strip context."""
+    end   = datetime.today().strftime('%Y-%m-%d')
+    start = (datetime.today() - timedelta(days=6)).strftime('%Y-%m-%d')
+    try:
+        r = requests.get(f"https://api.nasa.gov/neo/rest/v1/feed?start_date={start}&end_date={end}&api_key={NASA_KEY}", timeout=8).json()
+        counts = [len(v) for v in r.get("near_earth_objects", {}).values()]
+        return round(sum(counts) / len(counts), 1) if counts else None
+    except: return None
+
 def get_solar_activity():
     today = datetime.today().strftime('%Y-%m-%d')
     week_ago = (datetime.today() - timedelta(days=7)).strftime('%Y-%m-%d')
+    base = {"count": 0, "class": "—", "strongest": "—", "threat": "NOMINAL", "peak": "", "active": False}
     try:
         r = requests.get(f"https://api.nasa.gov/DONKI/FLR?startDate={week_ago}&endDate={today}&api_key={NASA_KEY}", timeout=8)
         if r.status_code == 200:
             flares = r.json()
             if flares:
                 latest = flares[-1]
-                return {"count": len(flares), "class": latest.get("classType", "?"), "peak": latest.get("peakTime", ""), "active": True}
-        return {"count": 0, "class": "—", "peak": "", "active": False}
-    except: return {"count": 0, "class": "—", "peak": "", "active": False}
+                rank = lambda c: {"X": 4, "M": 3, "C": 2, "B": 1}.get((c or " ")[0], 0)
+                strongest = max((f.get("classType") or "" for f in flares), key=rank, default="")
+                threat = "HIGH" if strongest.startswith("X") else "ELEVATED" if strongest.startswith("M") else "NOMINAL"
+                return {"count": len(flares), "class": latest.get("classType", "?"),
+                        "strongest": strongest or "?", "threat": threat,
+                        "peak": latest.get("peakTime", ""), "active": True}
+        return base
+    except: return base
 
 def get_mars_latest():
     try:
@@ -394,17 +551,19 @@ def get_epic_earth():
 
 # ── Auto-load on first render ──
 if st.session_state.auto_data is None:
-    with st.spinner("Initializing JARVIS neural core..."):
+    with jarvis_loader():
         people_count, people_names = get_people_in_space()
         asteroids = get_asteroid_radar()
         solar     = get_solar_activity()
         apod      = get_apod()
+        neo_avg   = get_neo_week_avg()
         st.session_state.auto_data = {
             "people_count": people_count,
             "people_names": people_names,
             "asteroids":    asteroids,
             "solar":        solar,
             "apod":         apod,
+            "neo_avg":      neo_avg,
         }
         if apod and apod.get("media_type") == "image":
             st.session_state.display = {
@@ -424,7 +583,7 @@ if st.session_state.auto_data is None:
             f"· <b>{people_count} humans</b> currently in space<br>"
             f"· <b>{asteroids['count']} near-Earth objects</b> tracked today — threat level: <b>{threat}</b><br>"
             f"· Solar activity: {solar_line}<br><br>"
-            f"Today's deep space image is loaded in the display panel. Use the mission directives to query any active feed."
+            f"Today's deep space image is loaded. Use the mission directives below to query any active feed."
         )]
 
 ad = st.session_state.auto_data
@@ -458,28 +617,62 @@ st.markdown(f"""
 <div class="spectrum"></div>
 """, unsafe_allow_html=True)
 
-# ── Compact Mission Strip ──
-neo_cls   = "ms-r" if ad["asteroids"]["hazardous"] > 0 else "ms-b"
-solar_cls = "ms-a" if ad["solar"]["active"] else "ms-g"
-solar_sub = f"CLASS {ad['solar']['class']} · LATEST FLARE" if ad["solar"]["active"] else "NO SIGNIFICANT ACTIVITY"
+# ── Mission Status Strip with context for first-time visitors ──
+neo_cls    = "ms-r" if ad["asteroids"]["hazardous"] > 0 else "ms-b"
+neo_status = "ELEVATED" if ad["asteroids"]["hazardous"] > 0 else "NOMINAL"
+neo_status_cls = "ms-status-warn" if ad["asteroids"]["hazardous"] > 0 else "ms-status-ok"
+
+neo_avg = ad.get("neo_avg")
+if neo_avg:
+    count = ad["asteroids"]["count"]
+    if count > neo_avg * 1.15:   neo_trend = f"ABOVE 7-DAY AVG ({neo_avg}/day)"
+    elif count < neo_avg * 0.85: neo_trend = f"BELOW 7-DAY AVG ({neo_avg}/day)"
+    else:                        neo_trend = f"NEAR 7-DAY AVG ({neo_avg}/day)"
+else:
+    neo_trend = "TYPICAL RANGE 5–25/DAY"
+
+crew = ad["people_count"]
+if crew == 0:        crew_level, crew_level_cls = "FEED OFFLINE", "ms-status-dim"
+elif crew > 13:      crew_level, crew_level_cls = "ABOVE NORMAL", "ms-status-amber"
+elif crew >= 7:      crew_level, crew_level_cls = "NORMAL", "ms-status-ok"
+else:                crew_level, crew_level_cls = "BELOW NORMAL", "ms-status-dim"
+crew_status = "ISS + TIANGONG" if crew >= 10 else "ISS ACTIVE"
+
+solar_threat = ad["solar"].get("threat", "NOMINAL")
+solar_cls = {"HIGH": "ms-r", "ELEVATED": "ms-a"}.get(solar_threat, "ms-g")
+solar_status_cls = {"HIGH": "ms-status-warn", "ELEVATED": "ms-status-amber"}.get(solar_threat, "ms-status-ok")
+solar_detail = f"PEAK CLASS {ad['solar'].get('strongest', '?')}" if ad["solar"]["active"] else "QUIET SUN"
 
 st.markdown(f"""
 <div class="mstrip">
   <div class="ms-item">
     <div class="ms-val {neo_cls}">{ad['asteroids']['count']}</div>
-    <div class="ms-lbl">Near-Earth Objects · {ad['asteroids']['hazardous']} Hazardous · Closest {ad['asteroids']['closest_km']:,} km</div>
+    <div class="ms-lbl">Near-Earth Objects passing today</div>
+    <div class="ms-row">
+      <div class="ms-status {neo_status_cls}">{neo_status} — {ad['asteroids']['hazardous']} hazardous</div>
+      <div class="ms-status ms-status-dim">{neo_trend}</div>
+    </div>
   </div>
   <div class="ms-item">
     <div class="ms-val ms-b">{ad['people_count']}</div>
-    <div class="ms-lbl">Crew In Space · Active Mission Personnel</div>
+    <div class="ms-lbl">Humans currently in space</div>
+    <div class="ms-row">
+      <div class="ms-status {crew_level_cls}">{crew_level}</div>
+      <div class="ms-status ms-status-dim">{crew_status}</div>
+    </div>
   </div>
   <div class="ms-item">
     <div class="ms-val {solar_cls}">{ad['solar']['count']}</div>
-    <div class="ms-lbl">Solar Flares · 7 Days · {solar_sub}</div>
+    <div class="ms-lbl">Solar flares in past 7 days</div>
+    <div class="ms-row">
+      <div class="ms-status {solar_status_cls}">THREAT {solar_threat}</div>
+      <div class="ms-status ms-status-dim">{solar_detail}</div>
+    </div>
   </div>
   <div class="ms-item">
-    <div class="ms-val ms-w" style="font-size:18px;">{datetime.utcnow().strftime('%H:%M:%S')}</div>
-    <div class="ms-lbl">Coordinated Universal Time · {datetime.utcnow().strftime('%Y-%m-%d')}</div>
+    <div class="ms-val ms-w" style="font-size:18px;letter-spacing:-0.5px;">{datetime.utcnow().strftime('%H:%M:%S')}</div>
+    <div class="ms-lbl">Coordinated Universal Time</div>
+    <div class="ms-status ms-status-ok">{datetime.utcnow().strftime('%Y-%m-%d')} · MISSION CLOCK</div>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -490,7 +683,7 @@ forced_prompt = ""
 
 # ── LEFT PANEL ──
 with left:
-    with st.container(height=450, border=True):
+    with st.container(height=455, border=True):
         disp = st.session_state.display
 
         if disp["type"] in ("apod", "mars", "epic") and disp.get("img_url"):
@@ -548,17 +741,72 @@ with left:
                 )
 
         else:
-            st.markdown("<span class='slbl'>PLANETARY DEFENSE — LIVE RADAR</span>", unsafe_allow_html=True)
+            # Default: rich planetary defense panel — never looks empty
             a = ad["asteroids"]
-            c1, c2 = st.columns(2)
-            with c1:
-                st.metric("NEAR-EARTH OBJECTS", str(a["count"]), "Tracked Today")
-                st.metric("CLOSEST APPROACH", f"{a['closest_km']:,} km", a["closest_name"][:20])
-            with c2:
-                badge = "HAZARDOUS DETECTED" if a["hazardous"] > 0 else "ALL NOMINAL"
-                st.metric("THREAT OBJECTS", str(a["hazardous"]), badge)
-                s = ad["solar"]
-                st.metric("SOLAR FLARES / 7D", str(s["count"]), f"Latest class {s['class']}")
+            s = ad["solar"]
+            threat_color = "#F87171" if a["hazardous"] > 0 else "#34D399"
+            threat_word  = "ELEVATED" if a["hazardous"] > 0 else "NOMINAL"
+
+            st.markdown(f"""
+            <span class='slbl'>PLANETARY DEFENSE — LIVE RADAR</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+              <div style="padding:12px 14px;border-radius:8px;background:rgba(255,255,255,.012);border:1px solid rgba(255,255,255,.035);">
+                <div style="font-family:'JetBrains Mono';font-size:7px;color:rgba(148,163,184,.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">Objects Today</div>
+                <div style="font-family:'JetBrains Mono';font-size:26px;font-weight:600;color:#38BDF8;letter-spacing:-1px;">{a['count']}</div>
+                <div style="font-family:'JetBrains Mono';font-size:7px;color:rgba(148,163,184,.25);margin-top:3px;">Near-Earth flyby</div>
+              </div>
+              <div style="padding:12px 14px;border-radius:8px;background:rgba(255,255,255,.012);border:1px solid rgba(255,255,255,.035);">
+                <div style="font-family:'JetBrains Mono';font-size:7px;color:rgba(148,163,184,.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">Threat Level</div>
+                <div style="font-family:'JetBrains Mono';font-size:26px;font-weight:600;color:{threat_color};letter-spacing:-1px;">{a['hazardous']}</div>
+                <div style="font-family:'JetBrains Mono';font-size:7px;color:{threat_color};opacity:.7;margin-top:3px;">{threat_word}</div>
+              </div>
+              <div style="padding:12px 14px;border-radius:8px;background:rgba(255,255,255,.012);border:1px solid rgba(255,255,255,.035);">
+                <div style="font-family:'JetBrains Mono';font-size:7px;color:rgba(148,163,184,.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;">Solar Flares 7D</div>
+                <div style="font-family:'JetBrains Mono';font-size:26px;font-weight:600;color:{'#FBBF24' if s['active'] else '#34D399'};letter-spacing:-1px;">{s['count']}</div>
+                <div style="font-family:'JetBrains Mono';font-size:7px;color:rgba(148,163,184,.25);margin-top:3px;">{'Class ' + s['class'] if s['active'] else 'Nominal'}</div>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            st.markdown("<span class='slbl'>CLOSEST APPROACH — TODAY</span>", unsafe_allow_html=True)
+
+            objects = a.get("objects", [])
+            if objects:
+                sorted_objs = sorted(
+                    objects,
+                    key=lambda x: float(x["close_approach_data"][0]["miss_distance"]["kilometers"])
+                )[:5]
+                for obj in sorted_objs:
+                    raw_name = obj.get("name", "Unknown")
+                    name = raw_name.strip("()").strip()
+                    dist_km = int(float(obj["close_approach_data"][0]["miss_distance"]["kilometers"]))
+                    speed_kph = int(float(obj["close_approach_data"][0]["relative_velocity"]["kilometers_per_hour"]))
+                    is_haz = obj.get("is_potentially_hazardous_asteroid", False)
+                    badge_cls = "ast-haz" if is_haz else "ast-safe"
+                    badge_txt = "HAZARDOUS" if is_haz else "SAFE"
+                    st.markdown(f"""
+                    <div class="ast-card">
+                      <div class="ast-name">{name}</div>
+                      <div class="ast-data">
+                        <span>{dist_km:,} km</span>
+                        <span>{speed_kph:,} km/h</span>
+                        <span class="ast-badge {badge_cls}">{badge_txt}</span>
+                      </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+            else:
+                # Animated starfield — the panel never sits empty
+                st.markdown("""
+                <div class="starfield">
+                  <div class="sf-layer"></div>
+                  <div class="sf-layer sf-2"></div>
+                  <div class="sf-layer sf-3"></div>
+                  <div class="sf-center">
+                    <div class="sf-txt">DEEP SPACE SCAN ACTIVE</div>
+                    <div class="sf-sub">Awaiting radar telemetry — select a mission directive below</div>
+                  </div>
+                </div>
+                """, unsafe_allow_html=True)
 
     st.markdown("""
     <div style="display:flex;align-items:center;gap:10px;margin:10px 0 8px;">
@@ -570,8 +818,8 @@ with left:
     b1, b2, b3, b4, b5, b6 = st.columns(6, gap="small")
 
     with b1:
-        if st.button("ASTRONOMY\nFEED"):
-            with st.spinner(""):
+        if st.button("APOD"):
+            with jarvis_loader():
                 apod = get_apod()
                 if apod and apod.get("media_type") == "image":
                     st.session_state.display = {"type": "apod", "img_url": apod["url"],
@@ -580,8 +828,8 @@ with left:
                                      f"Title: {apod.get('title')}. "
                                      f"Detail: {apod.get('explanation','')[:400]}")
     with b2:
-        if st.button("MARS\nSURFACE"):
-            with st.spinner(""):
+        if st.button("MARS"):
+            with jarvis_loader():
                 mars = get_mars_latest()
                 if mars:
                     st.session_state.display = {"type": "mars", "img_url": mars["img"],
@@ -591,8 +839,8 @@ with left:
                                      f"Sol {mars['sol']}, earth date {mars['date']}. Camera: {mars['camera']}. "
                                      f"Status: {mars['status']}. Give a crisp 2-sentence tactical surface report.")
     with b3:
-        if st.button("THREAT\nANALYSIS"):
-            with st.spinner(""):
+        if st.button("NEO"):
+            with jarvis_loader():
                 ast = get_asteroid_radar()
                 sol = get_solar_activity()
                 threat = "ELEVATED" if ast["hazardous"] > 0 else "NOMINAL"
@@ -604,8 +852,8 @@ with left:
                                  f"SOLAR WEATHER: {solar_line}. "
                                  f"Deliver a 3-sentence integrated threat assessment correlating both datasets.")
     with b4:
-        if st.button("ISS\nTRACKER"):
-            with st.spinner(""):
+        if st.button("ISS"):
+            with jarvis_loader():
                 lat, lon = get_iss_position()
                 if lat is not None:
                     st.session_state.iss_pos = (lat, lon)
@@ -615,8 +863,8 @@ with left:
                                      f"Orbital altitude ~408 km, speed ~27,600 km/h. "
                                      f"Give a 2-sentence tactical position report.")
     with b5:
-        if st.button("SOLAR\nWEATHER"):
-            with st.spinner(""):
+        if st.button("SOLAR"):
+            with jarvis_loader():
                 sol = get_solar_activity()
                 if sol:
                     forced_prompt = (f"Special Directive: DONKI Solar Activity. "
@@ -624,8 +872,8 @@ with left:
                                      f"Latest class: {sol['class']}. Peak: {sol['peak']}. "
                                      f"Give a 2-sentence space weather briefing and mission advisory.")
     with b6:
-        if st.button("EARTH\nEVENTS"):
-            with st.spinner(""):
+        if st.button("EARTH"):
+            with jarvis_loader():
                 events = get_earth_events()
                 if events:
                     st.session_state.display = {"type": "earth_events", "img_url": None,
@@ -652,7 +900,7 @@ with right:
     </div>
     """, unsafe_allow_html=True)
 
-    with st.container(height=400, border=True):
+    with st.container(height=430, border=True):
         for speaker, msg in st.session_state.chat_history:
             if speaker == "COMMANDER":
                 st.markdown(
@@ -721,7 +969,7 @@ with right:
             f"Active context: {active_prompt}"
         )
 
-        with st.spinner(""):
+        with jarvis_loader():
             try:
                 resp = client.models.generate_content(model="gemini-2.5-flash", contents=sys_instr)
                 reply = resp.text

@@ -6,6 +6,12 @@ from datetime import datetime
 from google import genai
 from google.genai import types
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    pass
+
 # ANSI Terminal Color Matrix
 GREEN = "\033[0;32m"
 CYAN = "\033[0;36m"
