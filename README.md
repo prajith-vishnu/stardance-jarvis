@@ -85,7 +85,7 @@ python jarvis.py
 
 ## Built For
 
-Hack Club Stardance 2026
+Hack Club 2026
 
 ## AI Usage
 
