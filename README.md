@@ -1,101 +1,45 @@
-# J.A.R.V.I.S. // NASA CORE
+# JARVIS — NASA Mission Control
 
-### Joint Artificial Reconnaissance & Vigilance Intelligence System
+My space dashboard project. It pulls live data from NASA's public APIs and lets you talk to JARVIS (yes, like Iron Man) about what's actually happening in space right now.
 
-<!-- Add a screenshot: docs/screenshot.png -->
-<!-- ![JARVIS Mission Control](docs/screenshot.png) -->
+**Live demo:** [stardance-jarvis.vercel.app](https://stardance-jarvis.vercel.app)
 
-A real-time NASA mission intelligence dashboard powered by six live NASA APIs and Google Gemini AI. Named after Iron Man's AI assistant, JARVIS monitors near-Earth asteroid threats, ISS crew status, Mars surface conditions, solar weather, and Earth events — all in one unified command interface.
+## What it does
 
-## Live Demo
+- Tracks asteroids passing Earth today and flags the dangerous ones
+- Shows how many people are in space right now
+- Live ISS position on a map
+- Solar flare monitor (past 7 days)
+- NASA's astronomy picture of the day + latest Mars rover photo
+- Ask JARVIS anything about space — you can talk to it with your mic and it talks back in a British accent
 
-🚀 **[stardance-jarvis.streamlit.app](https://stardance-jarvis.streamlit.app)**
+## How it works
 
-## Features
+The page itself is just HTML/CSS/JS, no framework. Two small Python functions run on Vercel:
 
-- **Planetary Defense Radar** — Real-time near-Earth object tracking from NASA NeoWs API, with hazard classification and 7-day trend context
-- **ISS Mission Control** — Live crew count and station position from Open Notify API, rendered on a dark-matter world map
-- **Mars Surface Feed** — Latest Curiosity rover imagery from NASA Mars Rover Photos API
-- **Solar Weather Monitor** — DONKI space weather alerts with NOMINAL / ELEVATED / HIGH threat levels
-- **Earth Events Tracker** — Active natural events (wildfires, storms, volcanoes) from NASA EONET API
-- **AI Mission Briefing** — Google Gemini powered natural-language interface for mission queries
-- **Voice Input & Speech Output** — Speak your queries directly to JARVIS; it answers out loud in a British accent
+- `api/feeds.py` — grabs data from the NASA APIs so my key never touches the browser
+- `api/chat.py` — sends your question to Gemini along with the live telemetry
 
-## NASA APIs Used
+NASA APIs used: NeoWs, APOD, Mars Rover Photos, DONKI, EONET, EPIC, plus Open Notify for the ISS.
 
-- NASA NeoWs (Near Earth Object Web Service)
-- NASA Astronomy Picture of the Day (APOD)
-- NASA Mars Rover Photos API
-- NASA DONKI (Space Weather Database)
-- NASA EONET (Earth Observatory Natural Event Tracker)
-- NASA EPIC (Earth Polychromatic Imaging Camera)
-- Open Notify ISS API
+## Run it yourself
 
-## Setup & Installation
+1. Get free keys at [api.nasa.gov](https://api.nasa.gov) and [aistudio.google.com](https://aistudio.google.com)
+2. Copy `.env.example` to `.env` and paste your keys in
+3. `python3 dev_server.py` and open http://localhost:8899
 
-### Prerequisites
+No pip installs needed. To deploy your own: import the repo on [vercel.com](https://vercel.com) and add `NASA_API_KEY` and `GEMINI_API_KEY` under Project Settings → Environment Variables.
 
-- Python 3.9+
-- NASA API key — free at [api.nasa.gov](https://api.nasa.gov)
-- Google Gemini API key — free at [aistudio.google.com](https://aistudio.google.com)
+The original Streamlit version lives in `legacy/` if you're curious.
 
-### Installation
+## AI note
 
-```bash
-git clone https://github.com/prajith-vishnu/stardance-jarvis
-cd stardance-jarvis
-pip install -r requirements.txt
-```
+I used Claude as a coding assistant while building this. The concept, feature choices, and the Iron Man HUD design direction are mine.
 
-### Configuration
-
-API keys are **never** hardcoded — the app reads them from Streamlit secrets (cloud) or a local `.env` file. Copy `.env.example` to `.env` and fill in your keys:
-
-```
-NASA_API_KEY=your_nasa_api_key_here
-GEMINI_API_KEY=your_gemini_api_key_here
-```
-
-For Streamlit Cloud deployment, add the same two keys under **App settings → Secrets** instead:
-
-```toml
-NASA_API_KEY = "your_nasa_api_key_here"
-GEMINI_API_KEY = "your_gemini_api_key_here"
-```
-
-### Run
-
-```bash
-streamlit run app.py
-```
-
-There is also a terminal-only version with macOS voice output:
-
-```bash
-python jarvis.py
-```
-
-## Tech Stack
-
-- Python 3.9+
-- Streamlit
-- Google Gemini AI (`google-genai`)
-- NASA Public APIs
-- Custom CSS with Iron Man HUD aesthetic (arc reactor, starfield, mission strip)
-
-## Built For
+## Built for
 
 Hack Club 2026
 
-## AI Usage
+---
 
-Claude (Anthropic) was used as a coding assistant to implement this project. All creative decisions — the JARVIS concept, NASA API selection, Iron Man HUD aesthetic, and feature design — were conceived and directed by Prajith Vishnu Rajesh Kumar.
-
-## License
-
-MIT
-
-## Creator
-
-**Prajith Vishnu Rajesh Kumar**
-Ray Braswell High School, Aubrey, Texas
+Prajith Vishnu Rajesh Kumar · Ray Braswell High School, Aubrey, TX · MIT License

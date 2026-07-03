@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>J.A.R.V.I.S. // NASA CORE</title>
+<meta name="description" content="Real-time NASA mission intelligence dashboard powered by seven live NASA feeds and Google Gemini AI.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hbar">
+    <div class="brand">
+      <div class="bname">J<span class="a">.</span>A<span class="a">.</span>R<span class="a">.</span>V<span class="a">.</span>I<span class="a">.</span>S<span class="a">.</span></div>
+      <div class="bsub">Joint Artificial Reconnaissance &amp; Vigilance Intelligence System</div>
+    </div>
+    <div class="pills" id="pills">
+      <span class="pill px" id="pill-clock">--:-- UTC</span>
+    </div>
+  </header>
+  <div class="spectrum"></div>
+
+  <div class="err-banner" id="errbanner"></div>
+
+  <div class="mstrip" id="mstrip">
+    <div class="ms-item">
+      <div class="ms-val ms-b" id="ms-neo">—</div>
+      <div class="ms-lbl">Near-Earth Objects passing today</div>
+      <div class="ms-row">
+        <div class="ms-status ms-status-dim" id="ms-neo-status">AWAITING TELEMETRY</div>
+        <div class="ms-status ms-status-dim" id="ms-neo-trend">TYPICAL RANGE 5–25/DAY</div>
+      </div>
+    </div>
+    <div class="ms-item">
+      <div class="ms-val ms-b" id="ms-crew">—</div>
+      <div class="ms-lbl">Humans currently in space</div>
+      <div class="ms-row">
+        <div class="ms-status ms-status-dim" id="ms-crew-level">AWAITING TELEMETRY</div>
+        <div class="ms-status ms-status-dim" id="ms-crew-status">ISS FEED</div>
+      </div>
+    </div>
+    <div class="ms-item">
+      <div class="ms-val ms-g" id="ms-solar">—</div>
+      <div class="ms-lbl">Solar flares in past 7 days</div>
+      <div class="ms-row">
+        <div class="ms-status ms-status-dim" id="ms-solar-status">AWAITING TELEMETRY</div>
+        <div class="ms-status ms-status-dim" id="ms-solar-detail">QUIET SUN</div>
+      </div>
+    </div>
+    <div class="ms-item">
+      <div class="ms-val ms-w" id="ms-clock" style="font-size:18px;letter-spacing:-0.5px;">--:--:--</div>
+      <div class="ms-lbl">Coordinated Universal Time</div>
+      <div class="ms-status ms-status-ok" id="ms-date">MISSION CLOCK</div>
+    </div>
+  </div>
+
+  <main class="cols">
+    <section>
+      <div class="panel display-panel" id="display"></div>
+      <div class="dir-head">
+        <span class="slbl">MISSION DIRECTIVES</span>
+        <div class="rule"></div>
+      </div>
+      <div class="directives">
+        <button class="dbtn" data-dir="apod">APOD</button>
+        <button class="dbtn" data-dir="mars">MARS</button>
+        <button class="dbtn" data-dir="neo">NEO</button>
+        <button class="dbtn" data-dir="iss">ISS</button>
+        <button class="dbtn" data-dir="solar">SOLAR</button>
+        <button class="dbtn" data-dir="earth">EARTH</button>
+      </div>
+    </section>
+
+    <section>
+      <div class="orb-wrap">
+        <div class="arc-r">
+          <div class="arc-ring3"></div>
+          <div class="arc-ring2"></div>
+          <div class="arc-ring1"></div>
+          <div class="arc-hex"></div>
+          <div class="arc-core"></div>
+        </div>
+        <div class="orb-lbl"><span class="sdot"></span>JARVIS CORE · ONLINE</div>
+      </div>
+      <div class="panel chat-box" id="chatlog"></div>
+      <form class="chat-form" id="chatform" autocomplete="off">
+        <input class="chat-input" id="chatinput" type="text" placeholder="Query NASA feeds or ask JARVIS anything..." maxlength="500">
+        <button class="icon-btn" id="micbtn" type="button" title="Voice input" aria-label="Voice input">◉</button>
+        <button class="icon-btn" type="submit" title="Send" aria-label="Send">▸</button>
+      </form>
+    </section>
+  </main>
+
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+legacy/
+dev_server.py
+__pycache__/
+*.pyc
+.env
+.env.example
