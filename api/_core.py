@@ -162,7 +162,8 @@ def jarvis_reply(prompt, context, gemini_key):
     body = {
         "system_instruction": {"parts": [{"text": sys_instr}]},
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.7, "maxOutputTokens": 512},
+        # thinking tokens count against the output cap and can truncate replies, so turn thinking off
+        "generationConfig": {"temperature": 0.7, "maxOutputTokens": 1024, "thinkingConfig": {"thinkingBudget": 0}},
     }
     out = _post_json(GEMINI_URL, body, {"x-goog-api-key": gemini_key})
     return out["candidates"][0]["content"]["parts"][0]["text"]
