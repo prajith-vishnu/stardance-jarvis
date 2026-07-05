@@ -8,7 +8,7 @@ NASA_BASE = "https://api.nasa.gov"
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 
 
-def _get_json(url, timeout=8):
+def _get_json(url, timeout=20):
     req = urllib.request.Request(url, headers={"User-Agent": "JARVIS-NASA-CORE/2.0"})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode("utf-8"))
